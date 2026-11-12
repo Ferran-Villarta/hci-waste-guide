@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Goes Where (prototype)</title>
+  <meta name="description" content="Student prototype for CPSC 481: a waste sorting guide. Not an official City of Calgary service.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div id="modal" class="modal" hidden></div>
+  <noscript><p class="notice" style="margin:16px">This prototype needs JavaScript. Please turn it on and reload the page.</p></noscript>
+
+  <!-- Plain scripts, in this order (no build step; also works when index.html is opened from a folder). -->
+  <script src="js/config.js"></script>
+  <script src="data/items.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

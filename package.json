@@ -1,0 +1,10 @@
+{
+  "name": "hci-waste-guide",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CPSC 481 vertical prototype: a waste sorting guide (static site, no build step).",
+  "scripts": {
+    "test": "node tests/data.test.js && node tests/search.test.js && node tests/store.test.js",
+    "start": "node tools/serve.js"
+  }
+}
