@@ -110,12 +110,19 @@
       .map(function (e) { return { item: byId[e.id], entry: e }; });
   }
 
-  function renderSearch(q) {
+  function renderSearch(q, notFound) {
     var query = q.trim();
     var results = query ? Search.search(query, D.ITEMS) : [];
     var suggestion = query && !results.length ? Search.suggest(query, D.ITEMS) : null;
     if (results.length) S.addRecent(query);
-    return UI.searchPage(ctx(), query, results, suggestion);
+    return UI.searchPage(ctx(), query, {
+      results: results,
+      suggestion: suggestion,
+      closeMatches: suggestion ? Search.search(suggestion, D.ITEMS).slice(0, 5) : [],
+      notFound: !!notFound,
+      // "Next item" screen: the last items the person looked up
+      recentItems: savedRows().slice(0, 5).map(function (r) { return r.item; }),
+    });
   }
 
   function renderItem(id, fresh) {
@@ -143,7 +150,7 @@
         html = UI.home(ctx());
         break;
       case 'search':
-        html = renderSearch(r.params.q || '');
+        html = renderSearch(r.params.q || '', r.params.nf === '1');
         title = 'Search – ' + title;
         break;
       case 'item':
@@ -237,7 +244,7 @@
 
     var dot = document.createElement('div');
     dot.className = 'fly';
-    dot.innerHTML = UI.icon('bookmark', 18);
+    dot.innerHTML = UI.img('bookmark-filled-white.svg', 18);
     dot.style.left = sx - 16 + 'px';
     dot.style.top = sy - 16 + 'px';
     document.body.appendChild(dot);
@@ -296,6 +303,14 @@
 
       case 'stub':
         openModal(UI.stubDialog(el.getAttribute('data-stub')));
+        break;
+
+      case 'menu':
+        openModal(UI.menuDialog());
+        break;
+
+      case 'how-saving':
+        openModal(UI.howSavingDialog());
         break;
 
       case 'photo':
@@ -369,6 +384,8 @@
       case 'jump':
         var target = document.getElementById('az-' + el.getAttribute('data-letter'));
         if (target) target.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+        Array.prototype.forEach.call(app.querySelectorAll('.letter.is-on'), function (b) { b.classList.remove('is-on'); });
+        el.classList.add('is-on');
         break;
     }
   }
@@ -451,7 +468,26 @@
     if (input) input.setAttribute('aria-expanded', 'false');
   }
 
+  // A–Z page: the filter field hides the rows that do not match.
+  function filterAz(value) {
+    var words = Search.normalize ? Search.normalize(value) : value.trim().toLowerCase();
+    var shown = 0;
+    Array.prototype.forEach.call(app.querySelectorAll('.az-group'), function (group) {
+      var any = false;
+      Array.prototype.forEach.call(group.querySelectorAll('li[data-name]'), function (li) {
+        var name = Search.normalize ? Search.normalize(li.getAttribute('data-name')) : li.getAttribute('data-name');
+        var ok = !words || name.indexOf(words) >= 0;
+        li.hidden = !ok;
+        if (ok) { any = true; shown++; }
+      });
+      group.hidden = !any;
+    });
+    var none = document.getElementById('az-none');
+    if (none) none.hidden = shown > 0;
+  }
+
   document.addEventListener('input', function (e) {
+    if (e.target && e.target.id === 'az-filter') { filterAz(e.target.value); return; }
     if (!e.target || e.target.id !== 'q') return;
     var list = document.getElementById('suggest');
     if (!list) return;

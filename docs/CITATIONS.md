@@ -18,6 +18,8 @@ Figma file. Check with the TA that the final wording of this section is what the
 | Item | Use | Source |
 |---|---|---|
 | Inter (font) | Text | Google Fonts, https://fonts.google.com/specimen/Inter (SIL Open Font License) |
+| Icons and bin cart drawings in `assets/` | All icons | Exported from the team's own Figma file ("What goes where redesign", page Components) |
+| City of Calgary logo (`assets/calgary.png`) | Top bar of the home screen, as in the Figma design | City of Calgary. Used only to show the redesign idea; check with the TA that this is allowed on the public demo link |
 
 No JavaScript libraries are used. Icons are simple SVG shapes written inside `js/ui.js`.
 

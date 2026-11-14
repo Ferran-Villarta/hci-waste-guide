@@ -36,9 +36,9 @@
     { id: 'aerosol-can', name: 'Aerosol can (empty)', category: 'food-packaging', bin: 'blue', how: 'It must be completely empty.', aliases: ['spray can', 'aerosol'] },
     {
       id: 'cup', name: 'Cup', category: 'food-packaging', aliases: ['cold drink cup', 'beverage cup', 'coffee cup', 'paper cup', 'plastic cup', 'foam cup', 'styrofoam'],
-      how: 'The bin depends on what the cup is made of.',
+      how: 'It depends on what the cup is made of:',
       options: [
-        { label: 'Paper cup (coffee cup)', note: 'Empty it. Put the lid in with it.', bin: 'blue' },
+        { label: 'Paper cup (coffee cup)', note: 'Empty it. Lid goes in the garbage.', bin: 'blue' },
         { label: 'Plastic cup', note: 'Empty and rinse it.', bin: 'blue' },
         { label: 'Foam cup (Styrofoam)', note: "Foam can't be recycled.", bin: 'black' },
       ],
@@ -46,7 +46,7 @@
     // ---- Paper and cardboard ----
     {
       id: 'pizza-box', name: 'Pizza box', category: 'paper', aliases: ['pizza', 'greasy box'],
-      how: 'It depends on the box.',
+      how: 'It depends on the box. Which one is yours?',
       options: [
         { label: 'Greasy or has food on it', note: 'Compost it. Grease spoils recycling.', bin: 'green' },
         { label: 'Clean and dry', note: 'Recycle it. Flatten it first.', bin: 'blue' },
@@ -68,7 +68,7 @@
     // ---- Hazardous ----
     { id: 'battery', name: 'Battery (household)', category: 'hazardous', bin: 'dropoff', how: 'Keep batteries separate and take them to a drop-off location.', aliases: ['batteries', 'aa battery', 'button battery'], warning: 'Batteries can start a fire in a cart or a truck. Do not put them in any cart.' },
     { id: 'car-battery', name: 'Car battery', category: 'hazardous', bin: 'dropoff', how: 'Take it to a hazardous waste drop-off or the place that sold it.', aliases: ['vehicle battery', 'auto battery'], warning: 'Car batteries contain acid and heavy metals. Do not put them in any cart.' },
-    { id: 'paint-can', name: 'Paint can (leftover paint)', category: 'hazardous', bin: 'dropoff', how: 'Close the lid tightly and take it to a hazardous waste drop-off.', aliases: ['paint', 'leftover paint'], warning: 'Hazardous, not for any cart. Paint can catch fire or leak in the truck. Take it to a hazardous waste drop-off.' },
+    { id: 'paint-can', name: 'Paint can (leftover paint)', category: 'hazardous', bin: 'dropoff', how: 'Close the lid tightly and take it to a hazardous waste drop-off.', aliases: ['paint', 'leftover paint'], warning: 'Paint can catch fire or leak in the truck. Take it to a hazardous waste drop-off.' },
     { id: 'used-oil', name: 'Used oil', category: 'hazardous', bin: 'dropoff', how: 'Transport it in a sealed container and take it to a drop-off.', aliases: ['motor oil', 'engine oil', 'oil'], warning: 'Oil can leak and pollute. Do not pour it down a drain or put it in any cart.' },
     // ---- Electronics ----
     { id: 'old-phone', name: 'Old phone', category: 'electronics', bin: 'dropoff', how: 'Take it to an electronics drop-off. Delete your data first.', aliases: ['mobile', 'cell phone', 'smartphone', 'charger'] },
