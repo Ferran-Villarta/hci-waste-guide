@@ -26,7 +26,7 @@ npm test
 index.html      page shell
 css/            styles
 js/             app logic (app, ui, search, store, config)
-data/           items, categories and bins
+data/           items, categories, bins, and made-up data for the demo screens
 assets/         icons and images exported from Figma
 tests/          automatic checks
 tools/          local server

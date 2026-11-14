@@ -157,13 +157,13 @@
 
   function home(ctx) {
     var menu = [
-      { stub: 'calendar', file: 'calendar-32.svg', label: 'Calendar' },
-      { stub: 'locations', file: 'pin-32.svg', label: 'Locations' },
-      { stub: 'help', file: 'help-32.svg', label: 'Help' },
-      { stub: 'language', file: 'globe-32.svg', label: 'Language' },
-      { stub: 'building', file: 'building-32.svg', label: 'Building' },
+      { panel: 'calendar', file: 'calendar-32.svg', label: 'Calendar' },
+      { panel: 'map', file: 'pin-32.svg', label: 'Locations' },
+      { panel: 'help', file: 'help-32.svg', label: 'Help' },
+      { panel: 'language', file: 'globe-32.svg', label: 'Language' },
+      { panel: 'building', file: 'building-32.svg', label: 'Building' },
     ].map(function (t) {
-      return '<li><button type="button" class="menu-tile" data-action="stub" data-stub="' + t.stub + '">' +
+      return '<li><button type="button" class="menu-tile" data-action="panel" data-panel="' + t.panel + '">' +
         '<span class="menu-tile-box">' + img(t.file, 32) + '</span><span class="menu-tile-label">' + esc(t.label) + '</span></button></li>';
     }).join('');
 
@@ -204,7 +204,7 @@
       '<a class="btn btn-outline" href="#/az">See all items A–Z</a>' +
       '<button type="button" class="btn btn-outline" data-action="photo">Take a photo instead</button>' +
       '<button type="button" class="btn btn-outline" data-action="report" data-q="' + esc(q) + '">Report missing item</button>' +
-      '<a class="btn btn-outline" href="tel:311">Call 311</a>' +
+      '<button type="button" class="btn btn-outline" data-action="call">Call 311</button>' +
       '<p class="small muted">Tip: check the spelling, or try a simpler word (e.g. &ldquo;tube&rdquo; or &ldquo;rubber&rdquo;).</p>'
     );
   }
@@ -261,22 +261,52 @@
       img('plus.svg', 18) + '<span>Save</span></button>';
   }
 
-  function itemPage(ctx, item, entry, pendingChoice) {
+  // extra (optional):
+  //   { scan: true }                    Figma "06 Search - Image result page" (after a photo search)
+  //   { address: a, building: b }       Figma "18c/18d/18e Building guide" item pages
+  function itemPage(ctx, item, entry, pendingChoice, extra) {
+    extra = extra || {};
     var hasOptions = !!item.options;
     var choice = entry && entry.choice != null ? entry.choice : pendingChoice;
     if (choice == null || !item.options || !item.options[choice]) choice = null;
     var id = esc(item.id);
 
-    var h = navBar(ctx, '#/') +
-      '<div class="item-img">' + placeholder('ph-hero') + savePill(item, entry) + '</div>' +
-      '<h1 class="h1">' + esc(item.name) + '</h1>';
+    var h = navBar(ctx, extra.address ? '#/building/' + extra.address.id : '#/');
+    if (extra.scan) {
+      h += '<p class="h1 h1-sm">Results for &ldquo;' + esc(item.name.replace(/\s*\(.*\)\s*/, '').toLowerCase()) + '&rdquo;</p>' +
+        '<div class="item-img">' + placeholder('ph-hero ph-220') + savePill(item, entry) + '</div>' +
+        '<h1 class="h1 h1-md">' + esc(item.name) + '</h1>';
+    } else {
+      h += '<div class="item-img">' + placeholder('ph-hero') + savePill(item, entry) + '</div>' +
+        '<h1 class="h1">' + esc(item.name) + '</h1>';
+    }
 
     if (item.warning) {
       // Figma "05d Item page – Hazardous (warning first)"
       h += '<div class="hazard" role="note">' + img('warning.svg', 24) +
         '<div class="hazard-text"><p class="hazard-title">Hazardous — not for any cart</p><p>' + esc(item.warning) + '</p>' +
-        '<button type="button" class="link link-pin" data-action="stub" data-stub="locations">' + img('pin.svg', 20) + 'Find a drop-off near me</button>' +
+        '<button type="button" class="link link-pin" data-action="panel" data-panel="map" data-filter="hazard">' + img('pin.svg', 20) + 'Find a drop-off near me</button>' +
         '</div></div>';
+    }
+
+    if (extra.building) {
+      // Building guide item: answer, "How to prepare it", "In your building"
+      h += answerBox(ctx, item.bin) +
+        '<div class="prep"><p class="prep-title">How to prepare it</p><p>' + esc(item.how) + '</p></div>' +
+        '<div class="grey-box">' + img('building-22.svg', 22) +
+        '<div><p class="grey-box-title">In your building</p><p class="muted">' + esc(extra.building.building) + ' Placeholder data.</p></div></div>' +
+        '<div class="next-row"><a class="btn-next" href="#/search">NEXT ITEM →</a></div>';
+      return frame(h);
+    }
+
+    if (item.alsoDepot && !hasOptions) {
+      // Figma "06": two answers, then the link to the map
+      h += answerBox(ctx, item.bin) +
+        '<section class="answer" aria-label="Or: bottle depot"><p class="answer-text">BOTTLE DEPOT</p></section>' +
+        '<button type="button" class="link link-pin" data-action="panel" data-panel="map" data-filter="depot">' + img('pin.svg', 20) + 'Find location near me!</button>' +
+        '<p class="body">' + esc(item.how) + ' Drink containers can also go to a bottle depot for the deposit refund.</p>' +
+        '<div class="next-row"><a class="btn-next" href="#/search">NEXT ITEM →</a></div>';
+      return frame(h);
     }
 
     if (hasOptions) {
@@ -420,17 +450,62 @@
       ? img(bin === 'blue' ? 'bin-blue-large.svg' : BIN_CART[bin], 96, 112, 'bin-cart-lg')
       : img('warning.svg', 64, 64, 'bin-cart-lg');
     var title = bin === 'dropoff' ? 'DROP-OFF ONLY — SPECIAL ITEMS' : 'THE ' + b.label + ' — ' + b.name.toUpperCase();
+    var info = (ctx.data.BIN_INFO || {})[bin];
+    var text = info
+      ? '<div class="crash-text">' +
+        '<div class="prep"><p class="prep-title">What goes in</p><p>' + esc(info.goes) + '</p></div>' +
+        '<div class="prep"><p class="prep-title">What never goes in</p><p>' + esc(info.never) + '</p></div>' +
+        '<div class="prep"><p class="prep-title">Tip</p><p>' + esc(info.tip) + '</p></div></div>'
+      : '';
     return frame(
       navBar(ctx, '#/') +
       '<div class="bin-head">' + art + '<h1 class="bin-title">' + esc(title) + '</h1></div>' +
-      placeholder('ph-banner') +
-      label('WHAT GOES IN IT') + rows(ctx, list)
+      placeholder('ph-banner') + text +
+      label('ITEMS IN OUR GUIDE') + rows(ctx, list)
     );
   }
 
   function notFoundPage(ctx, what) {
     return frame(navBar(ctx, '#/') + '<h1 class="h1">' + esc(what || 'Page not found') + '</h1>' +
       '<p class="body">We could not find this page. Try searching instead.</p>' + searchForm(''));
+  }
+
+  // ---------- building guide (Figma "18 Building guide") ----------
+
+  // Figma "18b Building guide – Your building"
+  function buildingPage(ctx, address) {
+    var cards = address.items.map(function (b) {
+      var it = ctx.byId[b.id];
+      if (!it) return '';
+      return '<a class="option" href="#/building/' + esc(address.id) + '/' + esc(it.id) + '">' +
+        '<span class="option-text"><span class="option-label">' + esc(it.name) + '</span><span class="option-note">' + esc(b.note) + '</span></span>' +
+        binTag(ctx, it.bin, true) + '</a>';
+    }).join('');
+    return frame(
+      navBar(ctx, '#/') +
+      '<h1 class="h1 h1-md">Building waste guide</h1>' +
+      '<p class="body">Here is what we know about your building:</p>' +
+      '<div class="grey-box">' + img('pin-addr.svg', 22) +
+      '<div class="grey-box-main"><p class="grey-box-title grey-box-title-lg">' + esc(address.short) + '</p><p class="muted">' + esc(address.kind) + '</p></div>' +
+      '<button type="button" class="link link-small" data-action="panel" data-panel="building">Change</button></div>' +
+      '<div class="card"><p class="card-title">Where to take your waste</p><p>' + esc(address.where) + '</p>' +
+      '<p class="small muted">Placeholder data. Real details would come from the building.</p></div>' +
+      '<p class="options-q">What are you sorting?</p>' +
+      '<div class="options">' + cards + '</div>'
+    );
+  }
+
+  // Figma "18f Building guide – Building details unavailable"
+  function buildingUnknownPage(ctx) {
+    return frame(
+      navBar(ctx, '#/') +
+      '<h1 class="h1 h1-md">Building details unavailable</h1>' +
+      '<p class="body">We don\'t have waste details for this address yet.</p>' +
+      '<div class="grey-box">' + img('info-24.svg', 22) + '<p>Check the signs near your bins, or ask your property manager.</p></div>' +
+      '<a class="btn btn-outline" href="#/search">Search an item instead</a>' +
+      '<button type="button" class="btn btn-outline" data-action="panel" data-panel="building">Try another address</button>' +
+      '<button type="button" class="btn btn-outline" data-action="call">Call 311</button>'
+    );
   }
 
   // ---------- dialogs (Figma pop-up panels) ----------
@@ -457,13 +532,13 @@
   function menuDialog() {
     var list = [
       ['calendar', 'Calendar Schedule', 'calendar.svg'],
-      ['locations', 'Special Disposal Centres', 'pin-24.svg'],
+      ['map', 'Special Disposal Centres', 'pin-24.svg'],
       ['building', 'Building waste guide', 'building.svg'],
       ['help', 'Need Help', 'help.svg'],
       ['language', 'Language (ENG)', 'globe.svg'],
     ];
     return dialog('More', '<div class="menu-rows">' + list.map(function (m) {
-      return '<button type="button" class="menu-row" data-action="stub" data-stub="' + m[0] + '"><span>' + esc(m[1]) + '</span>' + img(m[2], 24) + '</button>';
+      return '<button type="button" class="menu-row" data-action="panel" data-panel="' + m[0] + '"><span>' + esc(m[1]) + '</span>' + img(m[2], 24) + '</button>';
     }).join('') + '</div>', '');
   }
 
@@ -481,35 +556,194 @@
     }).join(''), '<button type="button" class="btn btn-outline" data-action="close-modal">Got it</button>');
   }
 
-  // Figma "09 Camera pop-up" (demo: nothing reads the photo)
+  // Figma "09 Camera pop-up". Demo: the capture button pretends the photo shows a pop can;
+  // "Browse device" pretends the chosen picture was not recognised (Figma "09b").
   function photoDialog() {
     return dialog('Photo search',
       '<div class="viewfinder" aria-hidden="true">' + placeholder('ph-200') + img('corner-brackets.svg', 260, 260, 'brackets') + '</div>' +
       '<p class="camera-dots" aria-hidden="true">•••</p>' +
-      '<p class="camera-text">Demo only: photo search is not built yet.</p>' +
-      '<button type="button" class="capture" data-action="photo-demo" aria-label="Take a photo">' + img('capture.svg', 76) + '</button>',
-      '<button type="button" class="btn btn-outline" data-action="photo-demo">BROWSE DEVICE</button>',
+      '<p class="camera-text">Point the camera at the item and tap the button.</p>' +
+      '<p class="small muted center">Demo: the photo is not really read. It always finds a pop can.</p>' +
+      '<button type="button" class="capture" data-action="photo-capture" aria-label="Take a photo">' + img('capture.svg', 76) + '</button>',
+      '<button type="button" class="btn btn-outline" data-action="photo-browse">BROWSE DEVICE</button>',
       { center: true, hideTitle: true });
   }
 
-  function reportDialog(prefill, error, note) {
-    return dialog('Report missing item',
-      '<form id="report-form" class="form" data-form="report" novalidate>' +
-      '<label class="form-label" for="report-item">What were you looking for?</label>' +
-      '<input class="input' + (error ? ' has-error' : '') + '" id="report-item" name="what" type="text" value="' + esc(prefill) + '" required' +
-      (error ? ' aria-invalid="true" aria-describedby="report-error"' : '') + '>' +
-      (error ? '<p class="error" id="report-error" role="alert">' + esc(error) + '</p>' : '') +
-      '<label class="form-label" for="report-note">Other details (optional)</label>' +
-      '<textarea class="input" id="report-note" name="note" rows="4">' + esc(note || '') + '</textarea></form>',
-      '<button type="submit" class="btn btn-small" form="report-form">Submit</button>' +
-      '<button type="button" class="btn btn-outline" data-action="close-modal">Cancel</button>');
+  // Figma "09b Camera pop-up – Scan failed (next steps)"
+  function scanFailedDialog() {
+    return dialog('We couldn\'t recognise this item',
+      '<div class="viewfinder" aria-hidden="true">' + placeholder('ph-200') + img('corner-brackets.svg', 260, 260, 'brackets') + '</div>' +
+      '<p class="scan-title">We couldn\'t recognise this item</p>' +
+      '<p class="muted">Try one of these next steps:</p>',
+      '<button type="button" class="btn btn-outline" data-action="panel" data-panel="photo">Try again (better light, closer)</button>' +
+      '<a class="btn btn-outline" href="#/search">Type the name instead</a>' +
+      '<a class="btn btn-outline" href="#/az">Browse the A–Z list</a>' +
+      '<button type="button" class="btn btn-outline" data-action="report" data-photo="1">Report missing item (photo attached)</button>',
+      { center: true, hideTitle: true });
   }
 
-  function reportDoneDialog() {
-    return dialog('Thank you',
-      '<div class="done">' + img('check.svg', 20) + '<div><p class="done-title">Report sent ✓</p>' +
-      '<p>This is a prototype, so your message was not sent anywhere. In the final service it would go to the team that updates the guide.</p></div></div>',
-      '<button type="button" class="btn btn-outline" data-action="close-modal">OK</button>');
+  function dropdown(id, name, options, selected) {
+    return '<div class="dd"><select class="input dd-select" id="' + id + '" name="' + name + '">' +
+      options.map(function (o) {
+        return '<option' + (o === selected ? ' selected' : '') + '>' + esc(o) + '</option>';
+      }).join('') + '</select></div>';
+  }
+
+  var ISSUES = ['Issue Form', 'Missing item', 'Wrong answer', 'Problem with the app', 'Other'];
+
+  function callButton() {
+    return '<button type="button" class="btn btn-outline" data-action="call">Call Helpline (311)' + img('phone.svg', 20) + '</button>';
+  }
+
+  // Figma "12 Help pop-up"
+  function helpDialog(error) {
+    return dialog('Need Help',
+      '<form id="help-form" class="form" data-form="help" novalidate>' +
+      '<label class="sr-only" for="help-type">Type of issue</label>' + dropdown('help-type', 'type', ISSUES, 'Issue Form') +
+      '<label class="sr-only" for="help-issue">Issue</label>' +
+      '<input class="input' + (error ? ' has-error' : '') + '" id="help-issue" name="issue" type="text" data-autofocus placeholder="Issue (i.e. &quot;missing item&quot;)"' +
+      (error ? ' aria-invalid="true" aria-describedby="help-error"' : '') + '>' +
+      (error ? '<p class="error" id="help-error" role="alert">' + esc(error) + '</p>' : '') +
+      '<label class="sr-only" for="help-details">Other details</label>' +
+      '<textarea class="input input-tall" id="help-details" name="details" placeholder="Other Details"></textarea>' +
+      '<button type="submit" class="btn btn-small">Submit</button></form>' +
+      '<div class="spacer" aria-hidden="true"></div>',
+      callButton(), { hideTitle: true });
+  }
+
+  // Figma "12b Report missing item (from failed scan)"
+  function reportDialog(prefill, error, note, withPhoto) {
+    return dialog('Report missing item',
+      '<form id="report-form" class="form" data-form="report" novalidate>' +
+      '<input type="hidden" name="photo" value="' + (withPhoto ? '1' : '') + '">' +
+      '<label class="sr-only" for="report-type">Type of issue</label>' + dropdown('report-type', 'type', ISSUES.slice(1), 'Missing item') +
+      '<label class="sr-only" for="report-item">Item you were looking for</label>' +
+      '<input class="input' + (error ? ' has-error' : '') + '" id="report-item" name="what" type="text" data-autofocus placeholder="Item (i.e. &quot;bike tube&quot;)" value="' + esc(prefill) + '" required' +
+      (error ? ' aria-invalid="true" aria-describedby="report-error"' : '') + '>' +
+      (error ? '<p class="error" id="report-error" role="alert">' + esc(error) + '</p>' : '') +
+      '<label class="sr-only" for="report-note">Other details</label>' +
+      '<textarea class="input input-tall" id="report-note" name="note" placeholder="' + (withPhoto ? 'Photo from your scan is attached.' : 'Other Details') + '">' + esc(note || '') + '</textarea>' +
+      (withPhoto ? '<div class="attached">' + placeholder('ph-56') + '<span>scan_photo.jpg — attached</span></div>' : '') +
+      '<div class="grey-box">' + img('bell-20.svg', 20) + '<p>We usually reply within 2 business days. You\'ll get a notification telling you which bin it goes in.</p></div>' +
+      '<button type="submit" class="btn btn-small">Submit</button></form>',
+      callButton(), { hideTitle: true });
+  }
+
+  // Figma "12c Report sent + notification"
+  function reportSentDialog(what) {
+    return dialog('Report sent',
+      '<div class="confirm-box">' + img('check-22.svg', 22) +
+      '<p>Thanks! We got your report about &ldquo;' + esc(what) + '&rdquo;. Expect an answer within 2 business days.</p></div>' +
+      '<p class="small muted">Until then, keep it aside. Don\'t put it in a cart if you\'re not sure.</p>' +
+      '<p class="small muted">Prototype: nothing was really sent.</p>' +
+      label('LATER: NOTIFICATION') +
+      '<div class="notif">' + img('bell-22.svg', 22) + '<div class="notif-text">' +
+      '<p class="notif-app">What Goes Where · now</p>' +
+      '<p class="notif-title">Your ' + esc(what) + ' goes in the Black bin</p>' +
+      '<p>Example reply. Tap to open the item and add it to your list.</p></div></div>',
+      '<button type="button" class="btn btn-outline" data-action="close-modal">Done</button>');
+  }
+
+  // Figma "12d call confirmation"
+  function callDialog() {
+    return dialog('311 Confirmation',
+      '<div class="confirm-box">' + img('check-22.svg', 22) +
+      '<p>Please confirm that you would like to call 311, the following confirmation will redirect you to a direct call!</p></div>',
+      '<a class="btn btn-outline" href="tel:311">Call 311' + img('phone.svg', 20) + '</a>' +
+      '<button type="button" class="btn btn-outline btn-cancel" data-action="close-modal">Cancel</button>');
+  }
+
+  // Figma "13 Language pop-up"
+  function languageDialog(languages) {
+    return dialog('Language', '<div class="menu-rows">' + languages.map(function (l) {
+      return '<button type="button" class="btn btn-outline" lang="' + esc(l.code) + '" data-action="language-pick" data-name="' + esc(l.name) + '">' + esc(l.name) + '</button>';
+    }).join('') + '</div>', '', { hideTitle: true });
+  }
+
+  // Figma "10 Calendar pop-up". Example schedule: green every week, blue and black on alternate weeks.
+  function calendarDialog(place) {
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = now.getMonth();
+    var days = new Date(year, month + 1, 0).getDate();
+    var monthName = now.toLocaleString('en', { month: 'long' }).toUpperCase();
+    var NAMES = { blue: 'Blue bin (recycling)', green: 'Green bin (compost)', black: 'Black bin (garbage)' };
+    var cells = '';
+    for (var d = 1; d <= days; d++) {
+      var bin = d % 7 === 3 ? 'green' : d % 7 === 2 ? (Math.floor(d / 7) % 2 === 0 ? 'blue' : 'black') : '';
+      cells += '<div class="cal-day"' + (bin ? ' aria-label="' + monthName + ' ' + d + ': ' + NAMES[bin] + '"' : '') + '>' +
+        '<span aria-hidden="' + (bin ? 'true' : 'false') + '">' + d + '</span>' + (bin ? img('dot-' + bin + '.svg', 7) : '') + '</div>';
+    }
+    for (var e = days; e % 7 !== 0; e++) cells += '<div class="cal-day" aria-hidden="true"></div>';
+    return dialog('Calendar Schedule',
+      '<form class="search" data-form="place" role="search">' +
+      '<label class="sr-only" for="place-q">Your address</label>' +
+      '<div class="field"><input id="place-q" name="q" type="search" placeholder="Search (i.e. &quot;Rundle&quot;)" autocomplete="off">' +
+      '<button type="submit" class="field-btn" aria-label="Search">' + img('search.svg', 24) + '</button></div></form>' +
+      '<button type="button" class="link" data-action="find-me">Find me!</button>' +
+      '<p class="cal-month">' + (place ? esc(monthName + ' · ' + place) : monthName) + '</p>' +
+      '<div class="cal" role="list" aria-label="Collection days">' + cells + '</div>' +
+      '<p class="cal-legend">' + img('dot-blue.svg', 7) + 'Blue ' + img('dot-green.svg', 7) + 'Green ' + img('dot-black.svg', 7) + 'Black</p>' +
+      '<p class="small muted">Example schedule. The real one depends on your address.</p>',
+      '', { hideTitle: true });
+  }
+
+  // Figma "11 Map pop-up" and "11b … Pin info card"
+  function mapDialog(demo, hidden) {
+    hidden = hidden || {};
+    var filters = demo.FILTERS.map(function (f) {
+      return '<label class="filter"><span class="check"><input type="checkbox" data-change="map-filter" data-type="' + f.type + '"' + (hidden[f.type] ? '' : ' checked') + '>' +
+        '<span class="check-box" aria-hidden="true">' + img('checkbox-checked.svg', 24) + '</span></span>' +
+        img('map-pin-' + f.type + '-20.svg', 20) + '<span>' + esc(f.label) + '</span></label>';
+    }).join('');
+    var pins = demo.SITES.map(function (s) {
+      var f = demo.FILTERS.filter(function (x) { return x.type === s.type; })[0];
+      return '<button type="button" class="pin pin-' + s.type + '" style="left:' + (s.x / 310 * 100) + '%;top:' + (s.y / 260 * 100) + '%" ' +
+        'data-action="map-pin" data-id="' + esc(s.id) + '" aria-label="' + esc(f.label + ': ' + s.name + ', ' + s.distance) + '">' +
+        '<img class="pin-ring" src="' + A + 'map-ring.png" width="54" height="54" alt="">' +
+        img('map-pin-' + s.type + '.svg', 26) + '</button>';
+    }).join('');
+    var hide = Object.keys(hidden).filter(function (k) { return hidden[k]; }).join(' ');
+    return dialog('Special Disposal Centres',
+      '<form class="search" data-form="place" role="search">' +
+      '<label class="sr-only" for="place-q">Search a place</label>' +
+      '<div class="field"><input id="place-q" name="q" type="search" placeholder="Search (i.e. &quot;Bundle&quot;)" autocomplete="off">' +
+      '<button type="submit" class="field-btn" aria-label="Search">' + img('search.svg', 24) + '</button></div></form>' +
+      '<button type="button" class="link" data-action="find-me">Find me!</button>' +
+      '<fieldset class="filters"><legend class="sr-only">Show on the map</legend>' + filters + '</fieldset>' +
+      '<div class="map" data-hide="' + hide + '">' + img('map-roads.svg', 310, 260, 'map-roads') + pins + '</div>' +
+      '<div id="pin-card" aria-live="polite"></div>',
+      '', { hideTitle: true });
+  }
+
+  function pinCard(site) {
+    var rowsHtml = [['Accepts', site.accepts], ['Hours', site.hours], ['Fees', site.fees], ['Distance', site.distance]].map(function (r) {
+      return '<div class="pin-row"><span class="pin-row-k">' + esc(r[0]) + '</span><span>' + esc(r[1]) + '</span></div>';
+    }).join('');
+    return '<div class="pin-card"><div class="pin-card-top">' + img('map-pin-' + site.type + '-20.svg', 21) +
+      '<p class="pin-card-title">' + esc(site.name) + '</p></div>' + rowsHtml +
+      '<p class="tiny muted">Placeholder data — real details come from the City\'s site list.</p>' +
+      '<div class="pin-card-btns"><button type="button" class="btn btn-small" data-action="demo" data-msg="Demo: directions would open in your maps app.">Directions</button>' +
+      '<button type="button" class="btn btn-small" data-action="call">Call site</button></div></div>';
+  }
+
+  // Figma "18 Building guide – Where do you live?"
+  function buildingDialog(addresses) {
+    return dialog('Building waste guide',
+      '<form id="building-form" class="form" data-form="building" autocomplete="off">' +
+      '<p class="options-q">Where do you live?</p>' +
+      '<label class="form-label form-label-sm" for="addr">Street address</label>' +
+      '<input class="input" id="addr" name="addr" type="text" data-autofocus placeholder="123 Example St" aria-controls="addr-list" aria-describedby="addr-hint">' +
+      '<p id="addr-hint" class="small muted">Example: 123 Example St NW. Placeholder address.</p>' +
+      '<ul id="addr-list" class="addr-list" aria-label="Suggested addresses">' + addressList(addresses) + '</ul>' +
+      '<div class="next-row"><button type="submit" class="btn-next">GET GUIDANCE →</button></div></form>',
+      '');
+  }
+
+  function addressList(addresses) {
+    return addresses.map(function (a) {
+      return '<li><a class="addr" href="#/building/' + esc(a.known ? a.id : 'unknown') + '">' + img('pin-addr.svg', 20) + '<span>' + esc(a.label) + '</span></a></li>';
+    }).join('');
   }
 
   function confirmDialog(title, text, confirmAction, confirmLabel) {
@@ -527,8 +761,12 @@
   root.WGW_UI = {
     esc: esc, icon: icon, img: img, home: home, searchPage: searchPage, itemPage: itemPage, savedPage: savedPage,
     azPage: azPage, categoriesPage: categoriesPage, categoryPage: categoryPage, binPage: binPage,
+    buildingPage: buildingPage, buildingUnknownPage: buildingUnknownPage,
     notFoundPage: notFoundPage, stubDialog: stubDialog, menuDialog: menuDialog, howSavingDialog: howSavingDialog,
-    photoDialog: photoDialog, reportDialog: reportDialog, reportDoneDialog: reportDoneDialog,
+    photoDialog: photoDialog, scanFailedDialog: scanFailedDialog, helpDialog: helpDialog,
+    reportDialog: reportDialog, reportSentDialog: reportSentDialog, callDialog: callDialog,
+    languageDialog: languageDialog, calendarDialog: calendarDialog, mapDialog: mapDialog, pinCard: pinCard,
+    buildingDialog: buildingDialog, addressList: addressList,
     confirmDialog: confirmDialog, suggestList: suggestList,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

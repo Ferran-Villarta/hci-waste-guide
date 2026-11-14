@@ -38,4 +38,26 @@ D.CATEGORIES.forEach(function (c) {
   }), name + ' must not be in the data (used to show the no-result screen)');
 });
 
+// every bin has crash course text
+Object.keys(D.BINS).forEach(function (b) {
+  var info = D.BIN_INFO && D.BIN_INFO[b];
+  assert.ok(info && info.goes && info.never && info.tip, 'bin "' + b + '" needs crash course text (goes, never, tip)');
+});
+
+// demo data (data/demo.js): building items must exist and have one bin; map sites need a known filter
+var DEMO = require('../data/demo.js');
+var byId = {};
+D.ITEMS.forEach(function (it) { byId[it.id] = it; });
+DEMO.ADDRESSES.forEach(function (a) {
+  if (!a.known) return;
+  a.items.forEach(function (b) {
+    assert.ok(byId[b.id], 'building ' + a.id + ': unknown item ' + b.id);
+    assert.ok(byId[b.id].bin && !byId[b.id].options, 'building ' + a.id + ': item ' + b.id + ' must have one bin');
+  });
+});
+var types = DEMO.FILTERS.map(function (f) { return f.type; });
+DEMO.SITES.forEach(function (s) {
+  assert.ok(types.indexOf(s.type) >= 0, 'site ' + s.id + ': unknown type ' + s.type);
+});
+
 console.log('data.test.js: all passed (' + D.ITEMS.length + ' items)');

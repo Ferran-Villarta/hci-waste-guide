@@ -40,16 +40,13 @@ Every picture is a grey placeholder box with an X (`placeholder()` in `ui.js`).
 - Places that use pictures: item page (big picture), list rows (56 px), saved rows (52 px), category tiles, category page banner, crash course banner.
 - Done when: items with a picture show it everywhere, items without one still show the placeholder, and nothing is stretched.
 
-### 3. Crash course text
+### 3. Crash course text (done, to check)
 
-The Figma crash course pages (frames "02 Crash Course page (Blue)", "02b … (Black)", "02c … (Green)") show a picture and three blocks of text, still placeholder lines. Our page shows the bin, a picture placeholder and the list of items.
+Done: `BIN_INFO` in `data/items.js` has, for each bin, what goes in, what never goes in, and a tip, shown on the crash course page. It is placeholder text: check it against the City guide together with the item answers (task 1).
 
-- Write, for each bin, three short blocks: what goes in, what never goes in, and one tip (for example "flatten boxes"). Keep the sentences short and simple.
-- Store the text in `data/items.js` next to `BINS`, and show it on the crash course page above the item list.
+### 4. Missing screens (from Figma) (done, except sub-categories)
 
-### 4. Missing screens (from Figma)
-
-Each one currently opens an "Under development" pop-up. Build them as demos (no real backend): believable content, working buttons, nothing sent anywhere.
+Done: all the screens below are built as demos (made-up data in `data/demo.js`, nothing sent anywhere). Only the last row is left. The table stays as a map from each screen to its Figma frame.
 
 | Screen | Figma frame (node id) | Notes |
 |---|---|---|
@@ -70,8 +67,9 @@ For each screen: read the frame with the Figma tools, export its icons, add the 
 - **Recent searches:** the team proposal is to not have this feature (Saved already keeps every item looked up). **Ask first**, then remove `recent`, `addRecent`, `getRecent` and `clearRecent` from `js/store.js`, the call in `js/app.js`, the related lines in `tests/store.test.js`, and update `docs/PROJECT-GUIDE.md`.
 - **Home button:** the house moved from the home screen to the nav bar of the other screens (not in Figma). If the team keeps it, update the Figma "Nav bar" component; if not, revert it in `navBar()` and `home()` in `ui.js`.
 - **Font:** **Ask first.** If the team agrees, download Inter (400, 500, 600, 700) into `assets/fonts/`, load it with `@font-face` in `style.css`, and remove the Google Fonts links from `index.html`.
-- **Tap targets:** some icon buttons are 32 px. Make their tappable area at least 44 × 44 px without changing how they look (padding with a negative margin).
-- **Accessibility check:** test with a keyboard only (Tab, Enter, Escape) and with a screen reader (VoiceOver on iPhone or TalkBack on Android). Check the contrast of the grey text (`--gray` on white) and fix anything below 4.5:1.
+- **Tap targets (done):** the nav bar icons, "← back" and the search field buttons now have a 44 px tap area. Still small: the A–Z letters (26 px, from Figma) and the ⊗ remove button in Saved.
+- **Contrast (done):** grey text on white passes (4.7:1). Grey text on the light grey boxes did not (4.2:1) and now uses the darker grey. **Ask first:** white text on the green bin tag is 3.4:1 (a Figma colour); a slightly darker green would pass.
+- **Accessibility check:** test with a keyboard only (Tab, Enter, Escape) and with a screen reader (VoiceOver on iPhone or TalkBack on Android).
 - **Logo:** **Ask the TA** whether the City of Calgary logo may be shown on the public demo. If not, replace it with a neutral title.
 
 ### 6. Online and final checks

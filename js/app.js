@@ -6,6 +6,7 @@
   'use strict';
 
   var D = window.WGW_DATA;
+  var DEMO = window.WGW_DEMO;
   var CFG = window.WGW_CONFIG || {};
   var S = window.WGW_STORE;
   var Search = window.WGW_SEARCH;
@@ -88,8 +89,9 @@
     modalEl.innerHTML = html;
     modalEl.hidden = false;
     document.body.classList.add('has-modal');
-    // Text fields first; otherwise the first button (the safe one: Cancel / OK).
-    var focusTarget = modalEl.querySelector('.dialog input, .dialog textarea') || modalEl.querySelector('.dialog button');
+    // A field marked data-autofocus first (forms); otherwise the first button (Close, the safe one).
+    // Fields are not focused by default: on a phone that would pop up the keyboard over the map or calendar.
+    var focusTarget = modalEl.querySelector('.dialog [data-autofocus]') || modalEl.querySelector('.dialog button');
     if (focusTarget) focusTarget.focus();
   }
 
@@ -125,7 +127,8 @@
     });
   }
 
-  function renderItem(id, fresh) {
+  // extra: see UI.itemPage (photo result or building guide)
+  function renderItem(id, fresh, extra) {
     var item = byId[id];
     if (!item) return UI.notFoundPage(ctx(), 'Item not found');
     // Opening a one-answer item saves it (if "save items when I open them" is on).
@@ -133,7 +136,21 @@
       S.save(id, null);
       pendingFly = true;
     }
-    return UI.itemPage(ctx(), item, S.getEntry(id), pendingChoice[id]);
+    return UI.itemPage(ctx(), item, S.getEntry(id), pendingChoice[id], extra);
+  }
+
+  function findAddress(id) {
+    return DEMO.ADDRESSES.filter(function (a) { return a.id === id && a.known; })[0];
+  }
+
+  // #/building/<address>  or  #/building/<address>/<item>  or  #/building/unknown
+  function renderBuilding(p, fresh) {
+    var address = findAddress(p[1]);
+    if (!address) return UI.buildingUnknownPage(ctx());
+    if (!p[2]) return UI.buildingPage(ctx(), address);
+    var b = address.items.filter(function (x) { return x.id === p[2]; })[0];
+    if (!b) return UI.notFoundPage(ctx(), 'Item not found');
+    return renderItem(p[2], fresh, { address: address, building: b });
   }
 
   var TITLES = { az: 'A–Z list', categories: 'Categories', saved: 'Saved' };
@@ -156,6 +173,14 @@
       case 'item':
         html = renderItem(p[1], !opts.keep);
         if (byId[p[1]]) title = byId[p[1]].name + ' – ' + title;
+        break;
+      case 'scan': // result of a (demo) photo search
+        html = renderItem(p[1], !opts.keep, { scan: true });
+        title = 'Photo result – ' + title;
+        break;
+      case 'building':
+        html = renderBuilding(p, !opts.keep);
+        title = 'Building waste guide – ' + title;
         break;
       case 'saved':
         html = UI.savedPage(ctx(), savedRows());
@@ -282,6 +307,72 @@
 
   S.onChange(updateBadge);
 
+  // ---------- pop-up panels (calendar, map, help, language, building, camera) ----------
+
+  var mapHidden = {}; // map filters that are switched off, e.g. { landfill: true }
+
+  function openPanel(key, el) {
+    switch (key) {
+      case 'calendar': openModal(UI.calendarDialog()); break;
+      case 'map':
+        // "Find a drop-off near me" opens the map showing only that kind of site.
+        var only = el && el.getAttribute('data-filter');
+        mapHidden = {};
+        if (only) DEMO.FILTERS.forEach(function (f) { if (f.type !== only) mapHidden[f.type] = true; });
+        openModal(UI.mapDialog(DEMO, mapHidden));
+        break;
+      case 'help': openModal(UI.helpDialog('')); break;
+      case 'language': openModal(UI.languageDialog(DEMO.LANGUAGES)); break;
+      case 'building': openModal(UI.buildingDialog(DEMO.ADDRESSES)); break;
+      case 'photo': openModal(UI.photoDialog()); break;
+      default: openModal(UI.stubDialog(key));
+    }
+  }
+
+  // "Find me!" and the place search in the calendar and map pop-ups (demo: no real lookup).
+  function findPlace(text) {
+    var cal = modalEl.querySelector('.cal-month');
+    if (cal) {
+      cal.textContent = cal.textContent.split(' · ')[0] + ' · ' + text;
+      toast('Example schedule for ' + text + '.');
+    } else {
+      toast('Demo: showing example sites near ' + text + '.');
+    }
+  }
+
+  function selectPin(el) {
+    var site = DEMO.SITES.filter(function (s) { return s.id === el.getAttribute('data-id'); })[0];
+    if (!site) return;
+    Array.prototype.forEach.call(modalEl.querySelectorAll('.pin.is-selected'), function (p) {
+      p.classList.remove('is-selected');
+      p.removeAttribute('aria-pressed');
+    });
+    el.classList.add('is-selected');
+    el.setAttribute('aria-pressed', 'true');
+    var card = document.getElementById('pin-card');
+    if (card) {
+      card.innerHTML = UI.pinCard(site);
+      card.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
+    }
+  }
+
+  function setMapFilter(type, on) {
+    mapHidden[type] = !on;
+    var map = modalEl.querySelector('.map');
+    if (!map) return;
+    map.setAttribute('data-hide', Object.keys(mapHidden).filter(function (k) { return mapHidden[k]; }).join(' '));
+    var sel = map.querySelector('.pin.is-selected.pin-' + type);
+    if (sel && !on) {
+      sel.classList.remove('is-selected');
+      document.getElementById('pin-card').innerHTML = '';
+    }
+  }
+
+  function matchAddresses(value) {
+    var v = value.trim().toLowerCase();
+    return DEMO.ADDRESSES.filter(function (a) { return !v || a.label.toLowerCase().indexOf(v) >= 0; });
+  }
+
   // ---------- actions ----------
 
   function onAction(e, el) {
@@ -317,13 +408,42 @@
         openModal(UI.photoDialog());
         break;
 
-      case 'photo-demo':
-        closeModal();
-        toast('Demo only. Photo search is not built yet.');
+      case 'panel':
+        openPanel(el.getAttribute('data-panel'), el);
+        break;
+
+      // Camera demo: taking a photo "finds" the pop can; browsing the device "fails".
+      case 'photo-capture':
+        go('#/scan/pop-can');
+        break;
+
+      case 'photo-browse':
+        openModal(UI.scanFailedDialog());
         break;
 
       case 'report':
-        openModal(UI.reportDialog(el.getAttribute('data-q') || '', ''));
+        openModal(UI.reportDialog(el.getAttribute('data-q') || '', '', '', el.getAttribute('data-photo') === '1'));
+        break;
+
+      case 'call':
+        openModal(UI.callDialog());
+        break;
+
+      case 'language-pick':
+        closeModal();
+        toast(el.getAttribute('data-name') + ': coming soon. The prototype is in English only.');
+        break;
+
+      case 'find-me':
+        findPlace('your location');
+        break;
+
+      case 'demo':
+        toast(el.getAttribute('data-msg') || 'Demo only.');
+        break;
+
+      case 'map-pin':
+        selectPin(el);
         break;
 
       case 'close-modal':
@@ -407,6 +527,8 @@
       render({ keep: true });
       var again = app.querySelector('input[data-change="sorted"][data-id="' + el.getAttribute('data-id') + '"]');
       if (again) again.focus({ preventScroll: true });
+    } else if (kind === 'map-filter') {
+      setMapFilter(el.getAttribute('data-type'), el.checked);
     }
   });
 
@@ -424,11 +546,30 @@
       // (the field is called "what" because form.elements.item is a built-in method, not our field)
       var what = form.elements.what.value.trim();
       if (!what) {
-        openModal(UI.reportDialog('', 'Please type what you were looking for.', form.elements.note.value));
+        openModal(UI.reportDialog('', 'Please type what you were looking for.', form.elements.note.value, form.elements.photo.value === '1'));
         return; // openModal puts the cursor in the field again
       }
       // Prototype: nothing is sent anywhere.
-      openModal(UI.reportDoneDialog());
+      openModal(UI.reportSentDialog(what.replace(/^item:\s*/i, '')));
+    } else if (kind === 'help') {
+      var issue = form.elements.issue.value.trim();
+      var details = form.elements.details.value.trim();
+      if (!issue && !details) {
+        openModal(UI.helpDialog('Please describe the issue.'));
+        return;
+      }
+      openModal(UI.reportSentDialog(issue || details.slice(0, 40)));
+    } else if (kind === 'place') {
+      findPlace(form.elements.q.value.trim() || 'your address');
+    } else if (kind === 'building') {
+      var addr = form.elements.addr.value.trim();
+      if (!addr) {
+        toast('Type your street address, or pick one from the list.');
+        form.elements.addr.focus();
+        return;
+      }
+      var found = matchAddresses(addr).filter(function (a) { return a.known; })[0];
+      go('#/building/' + (found ? found.id : 'unknown'));
     }
   });
 
@@ -440,7 +581,7 @@
     }
     // Keep Tab inside an open dialog.
     if (e.key === 'Tab' && !modalEl.hidden) {
-      var nodes = modalEl.querySelectorAll('.dialog button, .dialog input, .dialog textarea, .dialog a[href]');
+      var nodes = modalEl.querySelectorAll('.dialog button, .dialog input:not([type=hidden]), .dialog select, .dialog textarea, .dialog a[href]');
       if (!nodes.length) return;
       var first = nodes[0];
       var last = nodes[nodes.length - 1];
@@ -488,6 +629,11 @@
 
   document.addEventListener('input', function (e) {
     if (e.target && e.target.id === 'az-filter') { filterAz(e.target.value); return; }
+    if (e.target && e.target.id === 'addr') {
+      var list = document.getElementById('addr-list');
+      if (list) list.innerHTML = UI.addressList(matchAddresses(e.target.value));
+      return;
+    }
     if (!e.target || e.target.id !== 'q') return;
     var list = document.getElementById('suggest');
     if (!list) return;

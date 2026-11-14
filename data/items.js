@@ -13,6 +13,7 @@
  *   aliases   other words people type (used by search)
  *   options   for "it depends" items: [{ label, note, bin }]
  *   warning   hazard text shown above the answer (drop-off items)
+ *   alsoDepot true when the item can also go to a bottle depot (shows a second answer)
  */
 (function (root) {
   var CATEGORIES = [
@@ -26,7 +27,7 @@
 
   var ITEMS = [
     // ---- Food packaging ----
-    { id: 'pop-can', name: 'Pop can (aluminum)', category: 'food-packaging', bin: 'blue', how: 'Empty it. A quick rinse is fine.', aliases: ['can', 'soda can', 'aluminum can', 'pop', 'drink can'] },
+    { id: 'pop-can', name: 'Pop can (aluminum)', category: 'food-packaging', bin: 'blue', how: 'Empty it. A quick rinse is fine.', aliases: ['can', 'soda can', 'aluminum can', 'pop', 'drink can'], alsoDepot: true },
     { id: 'tin-can', name: 'Tin can', category: 'food-packaging', bin: 'blue', how: 'Empty and rinse it.', aliases: ['food can', 'soup can', 'steel can'] },
     { id: 'plastic-container', name: 'Plastic container (yogurt tub)', category: 'food-packaging', bin: 'blue', how: 'Empty and rinse it. Take the lid off.', aliases: ['plastic tub', 'yogurt tub', 'plastic container', 'takeout container'] },
     { id: 'milk-carton', name: 'Milk carton', category: 'food-packaging', bin: 'blue', how: 'Empty and rinse it, then flatten it.', aliases: ['carton', 'juice carton', 'juice box'] },
@@ -81,7 +82,31 @@
     dropoff: { label: 'DROP-OFF ONLY', name: 'Special drop-off' },
   };
 
-  var data = { CATEGORIES: CATEGORIES, ITEMS: ITEMS, BINS: BINS };
+  // Crash course text for each bin (PLACEHOLDER: check against the City guide).
+  var BIN_INFO = {
+    blue: {
+      goes: 'Paper, cardboard, cans, plastic containers, cartons, glass jars and bottles.',
+      never: 'Plastic bags, food-soiled items, foam, anything with food still in it.',
+      tip: 'Empty and rinse containers. Put items in loose, not in a bag. Flatten boxes.',
+    },
+    green: {
+      goes: 'Food scraps, food-soiled paper (napkins, greasy pizza boxes), coffee grounds, yard waste.',
+      never: 'Plastic of any kind, glass, metal, liquids.',
+      tip: 'Line the kitchen pail with newspaper or a paper bag to keep it clean.',
+    },
+    black: {
+      goes: 'Things that cannot be recycled or composted: food-soiled plastic, foam, diapers, broken dishes.',
+      never: 'Batteries, paint, oil, electronics, or anything that goes in the blue or green bin.',
+      tip: 'Bag your garbage and wrap sharp pieces in paper.',
+    },
+    dropoff: {
+      goes: 'Batteries, paint, motor oil, propane tanks, electronics.',
+      never: 'Never put these in any cart: they can start fires or leak in the truck.',
+      tip: 'Keep them in their original container and take them to a drop-off.',
+    },
+  };
+
+  var data = { CATEGORIES: CATEGORIES, ITEMS: ITEMS, BINS: BINS, BIN_INFO: BIN_INFO };
   root.WGW_DATA = data;
   if (typeof module !== 'undefined' && module.exports) module.exports = data;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="310" height="260" viewBox="0 0 310 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Roads" clip-path="url(#clip0_0_44)">
+<path id="Vector" d="M-10 70H90M90 70H218.859M90 70V-10M90 70V179.326M218.859 70H320M218.859 70C217.61 43.5104 216.976 17.2123 220 -10M218.859 70C220.426 103.222 222.962 136.745 220.47 172.751M-10 180C24.0304 176.219 55.2013 178.157 90 179.326M90 179.326C126.853 180.564 167.774 180.941 220.47 172.751M90 179.326V270M220.47 172.751C249.611 168.222 282.354 161.072 320 150M220.47 172.751C218.377 202.986 212.737 234.972 200 270" stroke-width="6" stroke-linecap="round" stroke="#C9C9C9"/>
+<path id="Vector_2" d="M-10 120H120M150 40L300 100" stroke-width="3" stroke-linecap="round" stroke="#C9C9C9"/>
+</g>
+<defs>
+<clipPath id="clip0_0_44">
+<rect width="310" height="260" fill="white"/>
+</clipPath>
+</defs>
+</svg>

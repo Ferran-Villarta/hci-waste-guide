@@ -13,13 +13,19 @@ Read this first if you are in the team. Section 0 says where the project stands 
 - Search: ranked results, nicknames ("soda can" finds the pop can), "Did you mean…?" for typos, and the no-result screen with four ways out.
 - Item page: the bin answer, preparation tip, "it depends" items (pizza box, cup), hazard warning first for drop-off items.
 - Saving: auto-save when an item is opened, "Saved ✓" / "+ Save" pill, Saved panel with TODAY / RECENT, sorted ticks, "All sorted ✓", remove with Undo, auto-save switch, "How saving works".
-- A–Z list with letter index and filter, category pages, crash course pages, ☰ menu, "Next item" screen.
+- A–Z list with letter index and filter, category pages, crash course pages (with text for each bin), ☰ menu, "Next item" screen.
 
-**Demo only** (the screen opens but does nothing real): photo search (camera pop-up), "Report missing item" (nothing is sent).
+**Built as demos** (every screen from Figma works and every button does something, but there is no real data or backend behind it):
+- Photo search: the capture button always "finds" a pop can and opens the photo result page; "Browse device" shows the "We couldn't recognise this item" screen.
+- Calendar: an example collection schedule for the current month.
+- Map of drop-off sites: filters, pins, and an info card when you tap a pin. "Find a drop-off near me" on hazardous items opens it.
+- Help form, "Report missing item" (with attached photo after a failed scan), "Report sent" with an example notification, and the "Call 311" confirmation. Nothing is sent anywhere.
+- Language: picking a language says "coming soon" (the prototype is in English only).
+- Building guide: address with suggestions, "your building" page, building-specific item pages, and "details unavailable" for unknown addresses.
 
-**Not built** (open an "Under development" pop-up): Calendar, Locations / map, Building guide, Help, Language.
+**Not built**: sub-categories on category pages (Figma frame "03"); our data has none, so category pages show the item list (frame "04").
 
-**Placeholders**: all item answers (taken from our Figma, not checked against the City's guide), all pictures (grey boxes with an X), the crash course text.
+**Placeholders**: all item answers and the crash course text (written by us, not checked against the City's guide), all pictures (grey boxes with an X), and everything in `data/demo.js` (sites, addresses, schedule).
 
 ### Open decisions for the team
 
@@ -30,16 +36,18 @@ Read this first if you are in the team. Section 0 says where the project stands 
 | City of Calgary logo on a public site | Ask the TA if it is allowed on the demo link. |
 | Auto-save on by default? Save animation on? | Both on now. Easy to switch in `js/config.js`. |
 | Font from Google or from our own files | Now from Google Fonts. Copying the font into the project makes it work offline and sends nothing to Google. |
-| Who builds which missing part | To split in the next meeting. |
+| Green bin tag contrast | White text on the Figma green (#2e9e4f) is 3.4:1, below the 4.5:1 accessibility minimum. A slightly darker green would pass. |
+| Sub-categories on category pages | Add them to the data (Figma "03") or keep the item list (Figma "04"). |
+| Who does what next | Real data, pictures, testing on phones. To split in the next meeting. |
 
 ### What to do next
 
 The full list, written so it can be pasted into an AI coding assistant (or used as a checklist), is in [`NEXT-STEPS-PROMPT.md`](NEXT-STEPS-PROMPT.md). In short:
 1. Replace the placeholder answers with real data from the City of Calgary "What Goes Where" guide.
 2. Add real pictures (items, categories, bins).
-3. Write the crash course text for each bin.
-4. Build the missing screens from Figma (calendar, map, help, report flow, language, building guide, image search result).
-5. Small clean-ups and checks (recent searches code, accessibility, tap sizes).
+3. Check the crash course text and the demo data with the team.
+4. The decisions in the table above.
+5. Accessibility checks with a screen reader on a real phone.
 6. Put it online on GitHub Pages and test it on real phones.
 
 ---
@@ -107,7 +115,9 @@ It is almost empty. It contains:
 
 The order matters because each file uses the ones loaded before it. `app.js` is last because it needs all the others.
 
-### 3.2 The data (`data/items.js`)
+### 3.2 The data (`data/items.js` and `data/demo.js`)
+
+`data/demo.js` holds the made-up data for the demo screens: drop-off sites on the map, building addresses and the list of languages. The rest of this section is about `data/items.js`.
 
 A list of 26 items. Each item has:
 - a **name** ("Pizza box"),
@@ -186,6 +196,10 @@ It does four things:
    | `#/az` | A–Z list |
    | `#/category/paper` | Items in one category |
    | `#/bin/blue` | Crash course for one bin |
+   | `#/scan/pop-can` | Result of a (demo) photo search |
+   | `#/building/123-example-st-nw` | Building guide for one address (`…/food-scraps` for one item, `#/building/unknown` when there are no details) |
+
+   The calendar, map, help, language, camera and report screens are pop-ups, not addresses: `app.js` opens them on top of the current screen.
 
    When the address changes, the browser tells the app, and the app draws the new screen. Because the screen lives in the address, **the browser's Back button works**, and you can copy a link to a specific item.
 
@@ -250,9 +264,9 @@ If auto-save is off, the pill says **"+ Save"** instead, and tapping it saves.
 3. If that is still not it, "Show 'We couldn't find it' options" leads to the no-result screen.
 4. You search "bike tube" (deliberately missing from the data). No matches and no suggestion, so you get **"We couldn't find "bike tube""** with four ways out: A–Z list, take a photo (demo), report the missing item (form, nothing is really sent), call 311.
 
-### Story E: the ☰ menu and the parts that are not built
+### Story E: the ☰ menu and the demo screens
 
-Tapping ☰ opens the "More" pop-up (Calendar Schedule, Special Disposal Centres, Building waste guide, Need Help, Language). Each opens a short "Under development" pop-up that explains what it would do in the real service. These parts exist in the Figma file but are outside this vertical prototype.
+Tapping ☰ opens the "More" pop-up (Calendar Schedule, Special Disposal Centres, Building waste guide, Need Help, Language); the same five are the icons on Home. Each opens its Figma screen, filled with made-up data from `data/demo.js`. For example, on the map you can switch the filters on and off, and tapping a pin shows that site's card. These screens show the design working; there is no real data behind them.
 
 ---
 
@@ -323,7 +337,7 @@ A: The screens were rebuilt from the Figma page "Redesign (final version)": same
 A: They are the image placeholders from the Figma design. Real photos would go there.
 
 **Q: Which parts are not built?**
-A: Calendar, Locations (map), Building guide, Help and Language. They open an "Under development" pop-up. Photo search is a demo: the camera pop-up opens, but it doesn't read the photo.
+A: Every Figma screen is built, except sub-categories on the category page. But the calendar, map, building guide, photo search, help and report screens are demos: they use made-up data (`data/demo.js`), the photo is never really read (the capture button always finds a pop can), and nothing is ever sent anywhere.
 
 **Q: Is it accessible?**
 A: It was built with this in mind: every icon button has a spoken name for screen readers, pop-ups keep the keyboard inside them and close with Escape, there is a "Skip to content" link, focus is clearly outlined, and the animation is skipped for people who ask their system to reduce motion.
