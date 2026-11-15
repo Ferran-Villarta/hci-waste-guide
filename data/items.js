@@ -17,7 +17,7 @@
  *   alsoDepot true when the item can also go to a bottle depot (shows a second answer)
  */
 (function (root) {
-  // Categories with "subs" open the sub-category grid (Figma "03"); the others list their items directly (Figma "04").
+  // Categories with "subs" open the sub-category grid (Figma "03"); a category without "subs" lists its items directly (Figma "04").
   // Every item in a category with subs needs a "sub" that matches one of them.
   var CATEGORIES = [
     { id: 'food-packaging', name: 'Food Packaging', subs: [
@@ -27,10 +27,13 @@
       { id: 'cardboard', name: 'Cardboard' }, { id: 'paper', name: 'Paper' }] },
     { id: 'food-scraps', name: 'Food Scraps', subs: [
       { id: 'fruit-veg', name: 'Fruit and vegetables' }, { id: 'other-food', name: 'Other food' }] },
-    { id: 'household', name: 'Household Items' },
+    { id: 'household', name: 'Household Items', subs: [
+      { id: 'kitchen', name: 'Kitchen' }, { id: 'bathroom', name: 'Bathroom' },
+      { id: 'clothing', name: 'Clothing and textiles' }] },
     { id: 'hazardous', name: 'Hazardous', subs: [
       { id: 'batteries', name: 'Batteries' }, { id: 'paint-oil', name: 'Paint and oil' }] },
-    { id: 'electronics', name: 'Electronics' },
+    { id: 'electronics', name: 'Electronics', subs: [
+      { id: 'phones-computers', name: 'Phones and computers' }, { id: 'small-appliances', name: 'Small appliances' }] },
   ];
 
   var ITEMS = [
@@ -72,15 +75,22 @@
     { id: 'apple-core', name: 'Apple core', category: 'food-scraps', sub: 'fruit-veg', bin: 'green', how: 'Compost it.', aliases: ['core', 'fruit'] },
     { id: 'coffee-grounds', name: 'Coffee grounds', category: 'food-scraps', sub: 'other-food', bin: 'green', how: 'Compost them, with the paper filter.', aliases: ['coffee', 'tea bag'] },
     // ---- Household ----
-    { id: 'broken-mug', name: 'Broken mug', category: 'household', bin: 'black', how: 'Wrap sharp pieces in paper before you put them in the garbage.', aliases: ['mug', 'broken glass', 'ceramic', 'plate'] },
-    { id: 'diaper', name: 'Diaper', category: 'household', bin: 'black', how: 'Wrap it and put it in the garbage.', aliases: ['nappy'] },
+    { id: 'broken-mug', name: 'Broken mug', category: 'household', sub: 'kitchen', bin: 'black', how: 'Wrap sharp pieces in paper before you put them in the garbage.', aliases: ['mug', 'broken glass', 'ceramic', 'plate'] },
+    { id: 'drinking-glass', name: 'Broken drinking glass', category: 'household', sub: 'kitchen', bin: 'black', how: 'Drinking glasses are not recycled like jars. Wrap the pieces in paper and put them in the garbage.', aliases: ['drinking glass', 'wine glass', 'tumbler'] },
+    { id: 'diaper', name: 'Diaper', category: 'household', sub: 'bathroom', bin: 'black', how: 'Wrap it and put it in the garbage.', aliases: ['nappy'] },
+    { id: 'toothbrush', name: 'Toothbrush', category: 'household', sub: 'bathroom', bin: 'black', how: 'Put it in the garbage.', aliases: ['electric toothbrush head', 'toothbrush head'] },
+    { id: 'old-clothes', name: 'Old clothes', category: 'household', sub: 'clothing', bin: 'black', how: 'If they can still be worn, donate them. If they are worn out, put them in the garbage.', aliases: ['clothes', 'clothing', 'shirt', 'jeans', 'textiles'] },
+    { id: 'old-towel', name: 'Old towel or bedding', category: 'household', sub: 'clothing', bin: 'black', how: 'Animal shelters often take old towels and blankets. Otherwise, put them in the garbage.', aliases: ['towel', 'bedding', 'sheets', 'blanket', 'pillow'] },
     // ---- Hazardous ----
     { id: 'battery', name: 'Battery (household)', category: 'hazardous', sub: 'batteries', bin: 'dropoff', how: 'Keep batteries separate and take them to a drop-off location.', aliases: ['batteries', 'aa battery', 'button battery'], warning: 'Batteries can start a fire in a cart or a truck. Do not put them in any cart.' },
     { id: 'car-battery', name: 'Car battery', category: 'hazardous', sub: 'batteries', bin: 'dropoff', how: 'Take it to a hazardous waste drop-off or the place that sold it.', aliases: ['vehicle battery', 'auto battery'], warning: 'Car batteries contain acid and heavy metals. Do not put them in any cart.' },
     { id: 'paint-can', name: 'Paint can (leftover paint)', category: 'hazardous', sub: 'paint-oil', bin: 'dropoff', how: 'Close the lid tightly and take it to a hazardous waste drop-off.', aliases: ['paint', 'leftover paint'], warning: 'Paint can catch fire or leak in the truck. Take it to a hazardous waste drop-off.' },
     { id: 'used-oil', name: 'Used oil', category: 'hazardous', sub: 'paint-oil', bin: 'dropoff', how: 'Transport it in a sealed container and take it to a drop-off.', aliases: ['motor oil', 'engine oil', 'oil'], warning: 'Oil can leak and pollute. Do not pour it down a drain or put it in any cart.' },
     // ---- Electronics ----
-    { id: 'old-phone', name: 'Old phone', category: 'electronics', bin: 'dropoff', how: 'Take it to an electronics drop-off. Delete your data first.', aliases: ['mobile', 'cell phone', 'smartphone', 'charger'] },
+    { id: 'old-phone', name: 'Old phone', category: 'electronics', sub: 'phones-computers', bin: 'dropoff', how: 'Take it to an electronics drop-off. Delete your data first.', aliases: ['mobile', 'cell phone', 'smartphone', 'charger'] },
+    { id: 'laptop', name: 'Old laptop or computer', category: 'electronics', sub: 'phones-computers', bin: 'dropoff', how: 'Take it to an electronics drop-off. Back up and delete your data first.', aliases: ['computer', 'laptop', 'desktop', 'tablet', 'keyboard', 'mouse'] },
+    { id: 'toaster', name: 'Toaster or kettle', category: 'electronics', sub: 'small-appliances', bin: 'dropoff', how: 'Small appliances go to an electronics drop-off, even if they are broken.', aliases: ['toaster', 'kettle', 'toaster oven', 'electric kettle'] },
+    { id: 'hair-dryer', name: 'Hair dryer or straightener', category: 'electronics', sub: 'small-appliances', bin: 'dropoff', how: 'Take it to an electronics drop-off.', aliases: ['hairdryer', 'blow dryer', 'straightener', 'curling iron'] },
   ];
 
   var BINS = {

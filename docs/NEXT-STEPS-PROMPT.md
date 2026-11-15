@@ -58,7 +58,7 @@ Done: all the screens below are built (the demos use made-up data in `data/demo.
 | Image search result | "06 Search - Image result page" (`116:563`) | What a successful photo search would show (for the demo, pretend the photo was a pop can). |
 | Language pop-up | "13 Language pop-up" (`116:789`) | List of languages. Picking one shows "Coming soon" (the prototype stays in English). |
 | Building guide | "18 … Where do you live?" (`162:889`), "18b … Your building" (`164:1009`), "18c/18d/18e" item pages (`164:1072`, `164:1114`, `164:1156`), "18f … details unavailable" (`162:936`) | New routes, e.g. `#/building` and `#/building/<item>`. Address autocomplete with a few fake addresses. |
-| Category page with sub-categories | "03 Category page" (`116:529`) | Done: `#/category/<id>` shows the sub-category grid, `#/category/<id>/<sub>` the items (frame "04"). Categories with one or two items skip the grid. The groups are ours; check them against the real data. |
+| Category page with sub-categories | "03 Category page" (`116:529`) | Done: `#/category/<id>` shows the sub-category grid, `#/category/<id>/<sub>` the items (frame "04"). Every category has sub-categories now (a category without `subs` would skip the grid). The groups are ours; check them against the real data. |
 
 For each screen: read the frame with the Figma tools, export its icons, add the HTML function to `ui.js`, wire it in `app.js` (a route for full screens, `openModal()` for pop-ups), connect the existing buttons (home tiles, ☰ menu rows) to it, and check it at 390 px wide.
 

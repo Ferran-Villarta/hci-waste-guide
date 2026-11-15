@@ -35,7 +35,7 @@ Read this first if you are in the team. Section 0 says where the project stands 
 | Auto-save on by default? Save animation on? | Both on now. Easy to switch in `js/config.js`. |
 | Font from Google or from our own files | Now from Google Fonts. Copying the font into the project makes it work offline and sends nothing to Google. |
 | Green bin tag | Done in code, to confirm: white text on the Figma green (#2e9e4f) was 3.4:1, below the WCAG 4.5:1 minimum for text. The tag now uses a darker green (#25803f, 5.0:1). Update the Figma colour if we keep it. |
-| Sub-categories | Done in code, to confirm: the groups (Plastic, Metal, Glass…) were chosen by us, since Figma only names "Plastic" and "Cardboard". Household Items and Electronics have too few items, so they show their item list directly. Rethink the groups when the real data comes in. |
+| Sub-categories | Done in code, to confirm: every category has sub-categories, chosen by us (Figma only names "Plastic" and "Cardboard"). Rethink the groups when the real data comes in. |
 | Who does what next | Real data, pictures, testing on phones. To split in the next meeting. |
 
 ### What to do next
@@ -117,7 +117,7 @@ The order matters because each file uses the ones loaded before it. `app.js` is 
 
 `data/demo.js` holds the made-up data for the demo screens: drop-off sites on the map, building addresses and the list of languages. The rest of this section is about `data/items.js`.
 
-A list of 26 items. Each item has:
+A list of 33 items. Each item has:
 - a **name** ("Pizza box"),
 - a **category** ("Paper and Cardboard") and, if that category has sub-categories, a **sub** ("Cardboard"),
 - a **bin**: blue, green, black or drop-off,
@@ -126,7 +126,15 @@ A list of 26 items. Each item has:
 - sometimes **options**, for "it depends" items (the pizza box can be greasy or clean, each with its own bin),
 - sometimes a **warning**, for hazardous items (battery, paint, oil).
 
-There are also 6 categories and the 4 bins with their labels ("BLUE BIN", "Recycling"). Four categories have sub-categories (Food Packaging: Plastic, Metal, Glass, Cartons and cups; Paper and Cardboard: Cardboard, Paper; Food Scraps: Fruit and vegetables, Other food; Hazardous: Batteries, Paint and oil). Household Items and Electronics have only one or two items, so they have none.
+There are also 6 categories and the 4 bins with their labels ("BLUE BIN", "Recycling"). Every category has sub-categories:
+- Food Packaging: Plastic, Metal, Glass, Cartons and cups
+- Paper and Cardboard: Cardboard, Paper
+- Food Scraps: Fruit and vegetables, Other food
+- Household Items: Kitchen, Bathroom, Clothing and textiles
+- Hazardous: Batteries, Paint and oil
+- Electronics: Phones and computers, Small appliances
+
+So when the real data is imported, each item only needs a category and a sub. The code still accepts a category without sub-categories (it then lists its items directly), in case the real guide has a small one.
 
 The answers are **placeholders** taken from the Figma screens. They are not checked against the City's real guide.
 
@@ -293,8 +301,8 @@ A: From the team's Figma screens. They are placeholders and have not been checke
 **Q: How do I add an item?**
 A: Add one entry to `data/items.js` (the top of that file explains every field), then run `npm test`. The test catches mistakes like a misspelled bin or category.
 
-**Q: Why do some categories have sub-categories and others don't?**
-A: Figma frame "03" shows a category as a grid of sub-categories, and frame "04" shows a list of items. We use "03" for categories with enough items to group (Food Packaging, Paper and Cardboard, Food Scraps, Hazardous). Household Items and Electronics have one or two items, so a grid of groups would only add a tap; they open the item list directly. When an item is added to a category with sub-categories, it needs a `sub`, and `npm test` checks it.
+**Q: How do sub-categories work?**
+A: Figma frame "03" shows a category as a grid of sub-categories, and frame "04" shows a list of items. Right now every category has sub-categories, so every category opens "03". The code also supports a category without them (its items show directly), for a small category in the real data. When an item is added to a category with sub-categories it needs a `sub`, and `npm test` checks it and also that no sub-category is empty.
 
 **Q: How does "soda can" find the pop can?**
 A: The pop can has "soda can" in its list of aliases (nicknames). The search looks at names and aliases, and ranks a nickname match just below a name match.
