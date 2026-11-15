@@ -9,7 +9,7 @@ Keep this file up to date. Copy it into the final portfolio.
 |---|---|---|
 | Starter code for this site (HTML, CSS, JavaScript, tests, README) | Claude Code, model Claude Sonnet 5.5 (Anthropic), started 2026-11-12 | *(add the name of the team member who reviewed it)* |
 | Placeholder item data in `data/items.js` (taken from the team's Figma screens, not from the City guide) | Claude Code | *(add name)* |
-| Crash course text (`BIN_INFO` in `data/items.js`) and made-up demo data in `data/demo.js` (sites, addresses) | Claude Code | *(add name)* |
+| Crash course text (`BIN_INFO` in `data/items.js`), the sub-category groups, and made-up demo data in `data/demo.js` (sites, addresses) | Claude Code | *(add name)* |
 
 The AI was used for programming only. The design (screens, layout, colours, flows) comes from the team's own
 Figma file. Check with the TA that the final wording of this section is what the course expects.

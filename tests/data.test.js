@@ -31,6 +31,20 @@ D.CATEGORIES.forEach(function (c) {
   assert.ok(D.ITEMS.some(function (it) { return it.category === c.id; }), 'category "' + c.id + '" has no items');
 });
 
+// sub-categories: every item in a category with subs has a known sub, and every sub has items
+D.CATEGORIES.forEach(function (c) {
+  var items = D.ITEMS.filter(function (it) { return it.category === c.id; });
+  if (!c.subs) {
+    items.forEach(function (it) { assert.ok(!it.sub, 'item "' + it.id + '": category ' + c.id + ' has no sub-categories'); });
+    return;
+  }
+  var subIds = c.subs.map(function (s) { return s.id; });
+  items.forEach(function (it) { assert.ok(subIds.indexOf(it.sub) >= 0, 'item "' + it.id + '": unknown sub ' + it.sub); });
+  subIds.forEach(function (s) {
+    assert.ok(items.some(function (it) { return it.sub === s; }), 'sub-category ' + c.id + '/' + s + ' has no items');
+  });
+});
+
 // the demo "no answer" searches must stay unanswered
 ['bike tube', 'car parts'].forEach(function (name) {
   assert.ok(!D.ITEMS.some(function (it) {

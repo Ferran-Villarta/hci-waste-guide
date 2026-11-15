@@ -191,10 +191,14 @@
     );
   }
 
-  function categoryTile(c) {
-    return '<li><a class="tile" href="#/category/' + esc(c.id) + '">' +
+  function tile(href, name) {
+    return '<li><a class="tile" href="' + esc(href) + '">' +
       '<span class="tile-img" aria-hidden="true">' + img('tile-placeholder.svg', 162, 110, 'ph-x') + '</span>' +
-      '<span class="tile-caption">' + esc(c.name) + '</span></a></li>';
+      '<span class="tile-caption">' + esc(name) + '</span></a></li>';
+  }
+
+  function categoryTile(c) {
+    return tile('#/category/' + c.id, c.name);
   }
 
   function noResult(ctx, q) {
@@ -436,10 +440,25 @@
       ctx.data.CATEGORIES.map(categoryTile).join('') + '</ul>');
   }
 
-  // Figma "04 Sub-category page": title and a list of items.
+  // Figma "03 Category page": title, banner picture, and a grid of sub-categories.
+  // A category without sub-categories goes straight to its item list (Figma "04").
   function categoryPage(ctx, cat, list) {
+    if (!cat.subs) return itemListPage(ctx, cat.name, list, '#/categories');
+    return frame(navBar(ctx, '#/categories') + '<h1 class="h1 h1-lg">' + esc(cat.name) + '</h1>' +
+      placeholder('ph-banner') +
+      '<ul class="tiles">' + cat.subs.map(function (s) {
+        return tile('#/category/' + cat.id + '/' + s.id, s.name);
+      }).join('') + '</ul>');
+  }
+
+  // Figma "04 Sub-category page": title and a list of items.
+  function subCategoryPage(ctx, cat, sub, list) {
+    return itemListPage(ctx, sub.name, list, '#/category/' + cat.id);
+  }
+
+  function itemListPage(ctx, title, list, fallback) {
     list = list.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
-    return frame(navBar(ctx, '#/') + '<h1 class="h1 h1-lg">' + esc(cat.name) + '</h1>' + rows(ctx, list));
+    return frame(navBar(ctx, fallback) + '<h1 class="h1 h1-lg">' + esc(title) + '</h1>' + rows(ctx, list));
   }
 
   // Figma "02 Crash Course page": big cart, title, then the items that go in it.
@@ -760,7 +779,7 @@
 
   root.WGW_UI = {
     esc: esc, icon: icon, img: img, home: home, searchPage: searchPage, itemPage: itemPage, savedPage: savedPage,
-    azPage: azPage, categoriesPage: categoriesPage, categoryPage: categoryPage, binPage: binPage,
+    azPage: azPage, categoriesPage: categoriesPage, categoryPage: categoryPage, subCategoryPage: subCategoryPage, binPage: binPage,
     buildingPage: buildingPage, buildingUnknownPage: buildingUnknownPage,
     notFoundPage: notFoundPage, stubDialog: stubDialog, menuDialog: menuDialog, howSavingDialog: howSavingDialog,
     photoDialog: photoDialog, scanFailedDialog: scanFailedDialog, helpDialog: helpDialog,

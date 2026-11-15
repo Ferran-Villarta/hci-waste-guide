@@ -15,7 +15,7 @@
   --blue: #1e6fd9;       /* blue bin tag */
   --link-blue: #1c6bd9;  /* "Did you mean", focus */
   --blue-soft: #edf5ff;
-  --green: #2e9e4f;      /* green bin tag, sorted tick */
+  --green: #25803f;      /* green bin tag, sorted tick (darker than Figma #2e9e4f so white text passes 4.5:1) */
   --green-line: #2e994d;
   --green-ink: #1a662e;
   --green-soft: #e8f7eb;

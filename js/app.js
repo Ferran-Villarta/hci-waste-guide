@@ -196,10 +196,18 @@
         break;
       case 'category':
         var cat = D.CATEGORIES.filter(function (c) { return c.id === p[1]; })[0];
-        html = cat
-          ? UI.categoryPage(ctx(), cat, D.ITEMS.filter(function (it) { return it.category === cat.id; }))
-          : UI.notFoundPage(ctx(), 'Category not found');
-        if (cat) title = cat.name + ' – ' + title;
+        var inCat = cat ? D.ITEMS.filter(function (it) { return it.category === cat.id; }) : [];
+        var sub = cat && p[2] ? (cat.subs || []).filter(function (s) { return s.id === p[2]; })[0] : null;
+        if (!cat || (p[2] && !sub)) {
+          html = UI.notFoundPage(ctx(), 'Category not found');
+        } else if (sub) {
+          // #/category/food-packaging/plastic
+          html = UI.subCategoryPage(ctx(), cat, sub, inCat.filter(function (it) { return it.sub === sub.id; }));
+          title = sub.name + ' – ' + cat.name + ' – ' + title;
+        } else {
+          html = UI.categoryPage(ctx(), cat, inCat);
+          title = cat.name + ' – ' + title;
+        }
         break;
       case 'bin':
         html = D.BINS[p[1]]

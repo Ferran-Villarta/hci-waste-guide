@@ -13,7 +13,7 @@ Read this first if you are in the team. Section 0 says where the project stands 
 - Search: ranked results, nicknames ("soda can" finds the pop can), "Did you mean…?" for typos, and the no-result screen with four ways out.
 - Item page: the bin answer, preparation tip, "it depends" items (pizza box, cup), hazard warning first for drop-off items.
 - Saving: auto-save when an item is opened, "Saved ✓" / "+ Save" pill, Saved panel with TODAY / RECENT, sorted ticks, "All sorted ✓", remove with Undo, auto-save switch, "How saving works".
-- A–Z list with letter index and filter, category pages, crash course pages (with text for each bin), ☰ menu, "Next item" screen.
+- A–Z list with letter index and filter, category pages with sub-categories (Food Packaging → Plastic → items), crash course pages (with text for each bin), ☰ menu, "Next item" screen.
 
 **Built as demos** (every screen from Figma works and every button does something, but there is no real data or backend behind it):
 - Photo search: the capture button always "finds" a pop can and opens the photo result page; "Browse device" shows the "We couldn't recognise this item" screen.
@@ -23,9 +23,7 @@ Read this first if you are in the team. Section 0 says where the project stands 
 - Language: picking a language says "coming soon" (the prototype is in English only).
 - Building guide: address with suggestions, "your building" page, building-specific item pages, and "details unavailable" for unknown addresses.
 
-**Not built**: sub-categories on category pages (Figma frame "03"); our data has none, so category pages show the item list (frame "04").
-
-**Placeholders**: all item answers and the crash course text (written by us, not checked against the City's guide), all pictures (grey boxes with an X), and everything in `data/demo.js` (sites, addresses, schedule).
+**Placeholders**: all item answers, the sub-category groups and the crash course text (written by us, not checked against the City's guide), all pictures (grey boxes with an X), and everything in `data/demo.js` (sites, addresses, schedule).
 
 ### Open decisions for the team
 
@@ -36,8 +34,8 @@ Read this first if you are in the team. Section 0 says where the project stands 
 | City of Calgary logo on a public site | Ask the TA if it is allowed on the demo link. |
 | Auto-save on by default? Save animation on? | Both on now. Easy to switch in `js/config.js`. |
 | Font from Google or from our own files | Now from Google Fonts. Copying the font into the project makes it work offline and sends nothing to Google. |
-| Green bin tag contrast | White text on the Figma green (#2e9e4f) is 3.4:1, below the 4.5:1 accessibility minimum. A slightly darker green would pass. |
-| Sub-categories on category pages | Add them to the data (Figma "03") or keep the item list (Figma "04"). |
+| Green bin tag | Done in code, to confirm: white text on the Figma green (#2e9e4f) was 3.4:1, below the WCAG 4.5:1 minimum for text. The tag now uses a darker green (#25803f, 5.0:1). Update the Figma colour if we keep it. |
+| Sub-categories | Done in code, to confirm: the groups (Plastic, Metal, Glass…) were chosen by us, since Figma only names "Plastic" and "Cardboard". Household Items and Electronics have too few items, so they show their item list directly. Rethink the groups when the real data comes in. |
 | Who does what next | Real data, pictures, testing on phones. To split in the next meeting. |
 
 ### What to do next
@@ -121,14 +119,14 @@ The order matters because each file uses the ones loaded before it. `app.js` is 
 
 A list of 26 items. Each item has:
 - a **name** ("Pizza box"),
-- a **category** ("Paper and Cardboard"),
+- a **category** ("Paper and Cardboard") and, if that category has sub-categories, a **sub** ("Cardboard"),
 - a **bin**: blue, green, black or drop-off,
 - **how**: a short preparation tip ("Flatten it first"),
 - **aliases**: other words people type ("soda can" for the pop can),
 - sometimes **options**, for "it depends" items (the pizza box can be greasy or clean, each with its own bin),
 - sometimes a **warning**, for hazardous items (battery, paint, oil).
 
-There are also 6 categories and the 4 bins with their labels ("BLUE BIN", "Recycling").
+There are also 6 categories and the 4 bins with their labels ("BLUE BIN", "Recycling"). Four categories have sub-categories (Food Packaging: Plastic, Metal, Glass, Cartons and cups; Paper and Cardboard: Cardboard, Paper; Food Scraps: Fruit and vegetables, Other food; Hazardous: Batteries, Paint and oil). Household Items and Electronics have only one or two items, so they have none.
 
 The answers are **placeholders** taken from the Figma screens. They are not checked against the City's real guide.
 
@@ -172,7 +170,7 @@ Items with score 0 are dropped, the rest are sorted best first (and alphabetical
 
 ### 3.6 The screens (`js/ui.js`)
 
-One function per screen: home, search results, item page, saved panel, A–Z list, category, bin ("crash course"), building guide, page not found, and the pop-ups (menu, camera, failed scan, how saving works, help, report missing item, report sent, call 311, language, calendar, map, building address, confirm, and a "coming soon" fallback for anything not built).
+One function per screen: home, search results, item page, saved panel, A–Z list, category (grid of sub-categories), sub-category (list of items), bin ("crash course"), building guide, page not found, and the pop-ups (menu, camera, failed scan, how saving works, help, report missing item, report sent, call 311, language, calendar, map, building address, confirm, and a "coming soon" fallback for anything not built).
 
 Each function receives data and returns the HTML of that screen as text. It does not react to clicks itself. Instead, buttons are labelled with what they should do (for example "this button means *save item pizza-box*"), and `app.js` reads those labels when they are clicked.
 
@@ -194,7 +192,8 @@ It does four things:
    | `#/item/pizza-box` | The answer for the pizza box |
    | `#/saved` | Saved panel |
    | `#/az` | A–Z list |
-   | `#/category/paper` | Items in one category |
+   | `#/category/paper` | One category: its sub-categories (or its items, if it has none) |
+   | `#/category/paper/cardboard` | Items in one sub-category |
    | `#/bin/blue` | Crash course for one bin |
    | `#/scan/pop-can` | Result of a (demo) photo search |
    | `#/building/123-example-st-nw` | Building guide for one address (`…/food-scraps` for one item, `#/building/unknown` when there are no details) |
@@ -211,7 +210,7 @@ It does four things:
 
 ### 3.8 The look (`css/style.css`)
 
-All values come from the Figma frames: 390 px wide screens, 20 px side margins, 18 px between blocks, Inter font, the exact colours of the bin tags, the border thicknesses and corner roundings. Colours are defined once at the top as named tokens (`--blue`, `--green`, …), so changing a colour is a one-line change.
+All values come from the Figma frames: 390 px wide screens, 20 px side margins, 18 px between blocks, Inter font, the colours of the bin tags (except the green, made darker for contrast), the border thicknesses and corner roundings. Colours are defined once at the top as named tokens (`--blue`, `--green`, …), so changing a colour is a one-line change.
 
 On a big screen the content stays a phone-width column in the middle, because the design is for phones.
 
@@ -294,6 +293,9 @@ A: From the team's Figma screens. They are placeholders and have not been checke
 **Q: How do I add an item?**
 A: Add one entry to `data/items.js` (the top of that file explains every field), then run `npm test`. The test catches mistakes like a misspelled bin or category.
 
+**Q: Why do some categories have sub-categories and others don't?**
+A: Figma frame "03" shows a category as a grid of sub-categories, and frame "04" shows a list of items. We use "03" for categories with enough items to group (Food Packaging, Paper and Cardboard, Food Scraps, Hazardous). Household Items and Electronics have one or two items, so a grid of groups would only add a tap; they open the item list directly. When an item is added to a category with sub-categories, it needs a `sub`, and `npm test` checks it.
+
 **Q: How does "soda can" find the pop can?**
 A: The pop can has "soda can" in its list of aliases (nicknames). The search looks at names and aliases, and ranks a nickname match just below a name match.
 
@@ -337,7 +339,10 @@ A: The screens were rebuilt from the Figma page "Redesign (final version)": same
 A: They are the image placeholders from the Figma design. Real photos would go there.
 
 **Q: Which parts are not built?**
-A: Every Figma screen is built, except sub-categories on the category page. But the calendar, map, building guide, photo search, help and report screens are demos: they use made-up data (`data/demo.js`), the photo is never really read (the capture button always finds a pop can), and nothing is ever sent anywhere.
+A: Every Figma screen is built. But the calendar, map, building guide, photo search, help and report screens are demos: they use made-up data (`data/demo.js`), the photo is never really read (the capture button always finds a pop can), and nothing is ever sent anywhere.
+
+**Q: Why is the green tag darker than in Figma?**
+A: Accessibility. The WCAG guidelines (the international web accessibility standard, success criterion 1.4.3, level AA) ask for a contrast of at least 4.5:1 between normal-size text and its background. White text on the Figma green was 3.4:1; the darker green is 5.0:1. You can check any pair of colours at webaim.org/resources/contrastchecker.
 
 **Q: Is it accessible?**
 A: It was built with this in mind: every icon button has a spoken name for screen readers, pop-ups keep the keyboard inside them and close with Escape, there is a "Skip to content" link, focus is clearly outlined, and the animation is skipped for people who ask their system to reduce motion.

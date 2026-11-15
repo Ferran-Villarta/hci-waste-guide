@@ -8,6 +8,7 @@
  *   id        unique, lowercase, dashes
  *   name      shown to the user
  *   category  one of CATEGORIES[].id
+ *   sub       one of that category's subs[].id (only when the category has subs)
  *   bin       'blue' | 'green' | 'black' | 'dropoff'     (omit when the item has options)
  *   how       short preparation advice
  *   aliases   other words people type (used by search)
@@ -16,27 +17,34 @@
  *   alsoDepot true when the item can also go to a bottle depot (shows a second answer)
  */
 (function (root) {
+  // Categories with "subs" open the sub-category grid (Figma "03"); the others list their items directly (Figma "04").
+  // Every item in a category with subs needs a "sub" that matches one of them.
   var CATEGORIES = [
-    { id: 'food-packaging', name: 'Food Packaging' },
-    { id: 'paper', name: 'Paper and Cardboard' },
-    { id: 'food-scraps', name: 'Food Scraps' },
+    { id: 'food-packaging', name: 'Food Packaging', subs: [
+      { id: 'plastic', name: 'Plastic' }, { id: 'metal', name: 'Metal' },
+      { id: 'glass', name: 'Glass' }, { id: 'cartons-cups', name: 'Cartons and cups' }] },
+    { id: 'paper', name: 'Paper and Cardboard', subs: [
+      { id: 'cardboard', name: 'Cardboard' }, { id: 'paper', name: 'Paper' }] },
+    { id: 'food-scraps', name: 'Food Scraps', subs: [
+      { id: 'fruit-veg', name: 'Fruit and vegetables' }, { id: 'other-food', name: 'Other food' }] },
     { id: 'household', name: 'Household Items' },
-    { id: 'hazardous', name: 'Hazardous' },
+    { id: 'hazardous', name: 'Hazardous', subs: [
+      { id: 'batteries', name: 'Batteries' }, { id: 'paint-oil', name: 'Paint and oil' }] },
     { id: 'electronics', name: 'Electronics' },
   ];
 
   var ITEMS = [
     // ---- Food packaging ----
-    { id: 'pop-can', name: 'Pop can (aluminum)', category: 'food-packaging', bin: 'blue', how: 'Empty it. A quick rinse is fine.', aliases: ['can', 'soda can', 'aluminum can', 'pop', 'drink can'], alsoDepot: true },
-    { id: 'tin-can', name: 'Tin can', category: 'food-packaging', bin: 'blue', how: 'Empty and rinse it.', aliases: ['food can', 'soup can', 'steel can'] },
-    { id: 'plastic-container', name: 'Plastic container (yogurt tub)', category: 'food-packaging', bin: 'blue', how: 'Empty and rinse it. Take the lid off.', aliases: ['plastic tub', 'yogurt tub', 'plastic container', 'takeout container'] },
-    { id: 'milk-carton', name: 'Milk carton', category: 'food-packaging', bin: 'blue', how: 'Empty and rinse it, then flatten it.', aliases: ['carton', 'juice carton', 'juice box'] },
-    { id: 'glass-jar', name: 'Rinsed glass jar', category: 'food-packaging', bin: 'blue', how: 'Rinse it and take the lid off.', aliases: ['jar', 'glass bottle', 'glass'] },
-    { id: 'food-soiled-bag', name: 'Food-soiled Ziploc bag', category: 'food-packaging', bin: 'black', how: "Food-soiled plastic can't be recycled. Put it in the garbage. No need to rinse it.", aliases: ['ziploc', 'plastic bag', 'zip bag', 'sandwich bag'] },
-    { id: 'aluminum-foil', name: 'Aluminum foil (clean)', category: 'food-packaging', bin: 'blue', how: 'Only clean foil. Scrape off food first.', aliases: ['foil', 'tin foil'] },
-    { id: 'aerosol-can', name: 'Aerosol can (empty)', category: 'food-packaging', bin: 'blue', how: 'It must be completely empty.', aliases: ['spray can', 'aerosol'] },
+    { id: 'pop-can', name: 'Pop can (aluminum)', category: 'food-packaging', sub: 'metal', bin: 'blue', how: 'Empty it. A quick rinse is fine.', aliases: ['can', 'soda can', 'aluminum can', 'pop', 'drink can'], alsoDepot: true },
+    { id: 'tin-can', name: 'Tin can', category: 'food-packaging', sub: 'metal', bin: 'blue', how: 'Empty and rinse it.', aliases: ['food can', 'soup can', 'steel can'] },
+    { id: 'plastic-container', name: 'Plastic container (yogurt tub)', category: 'food-packaging', sub: 'plastic', bin: 'blue', how: 'Empty and rinse it. Take the lid off.', aliases: ['plastic tub', 'yogurt tub', 'plastic container', 'takeout container'] },
+    { id: 'milk-carton', name: 'Milk carton', category: 'food-packaging', sub: 'cartons-cups', bin: 'blue', how: 'Empty and rinse it, then flatten it.', aliases: ['carton', 'juice carton', 'juice box'] },
+    { id: 'glass-jar', name: 'Rinsed glass jar', category: 'food-packaging', sub: 'glass', bin: 'blue', how: 'Rinse it and take the lid off.', aliases: ['jar', 'glass bottle', 'glass'] },
+    { id: 'food-soiled-bag', name: 'Food-soiled Ziploc bag', category: 'food-packaging', sub: 'plastic', bin: 'black', how: "Food-soiled plastic can't be recycled. Put it in the garbage. No need to rinse it.", aliases: ['ziploc', 'plastic bag', 'zip bag', 'sandwich bag'] },
+    { id: 'aluminum-foil', name: 'Aluminum foil (clean)', category: 'food-packaging', sub: 'metal', bin: 'blue', how: 'Only clean foil. Scrape off food first.', aliases: ['foil', 'tin foil'] },
+    { id: 'aerosol-can', name: 'Aerosol can (empty)', category: 'food-packaging', sub: 'metal', bin: 'blue', how: 'It must be completely empty.', aliases: ['spray can', 'aerosol'] },
     {
-      id: 'cup', name: 'Cup', category: 'food-packaging', aliases: ['cold drink cup', 'beverage cup', 'coffee cup', 'paper cup', 'plastic cup', 'foam cup', 'styrofoam'],
+      id: 'cup', name: 'Cup', category: 'food-packaging', sub: 'cartons-cups', aliases: ['cold drink cup', 'beverage cup', 'coffee cup', 'paper cup', 'plastic cup', 'foam cup', 'styrofoam'],
       how: 'It depends on what the cup is made of:',
       options: [
         { label: 'Paper cup (coffee cup)', note: 'Empty it. Lid goes in the garbage.', bin: 'blue' },
@@ -46,31 +54,31 @@
     },
     // ---- Paper and cardboard ----
     {
-      id: 'pizza-box', name: 'Pizza box', category: 'paper', aliases: ['pizza', 'greasy box'],
+      id: 'pizza-box', name: 'Pizza box', category: 'paper', sub: 'cardboard', aliases: ['pizza', 'greasy box'],
       how: 'It depends on the box. Which one is yours?',
       options: [
         { label: 'Greasy or has food on it', note: 'Compost it. Grease spoils recycling.', bin: 'green' },
         { label: 'Clean and dry', note: 'Recycle it. Flatten it first.', bin: 'blue' },
       ],
     },
-    { id: 'cardboard-box', name: 'Cardboard box', category: 'paper', bin: 'blue', how: 'Flatten it and remove any packing tape.', aliases: ['cardboard', 'box', 'shipping box'] },
-    { id: 'bakery-box', name: 'Bakery box', category: 'paper', bin: 'blue', how: 'Flatten it. Remove food and any plastic window.', aliases: ['cake box', 'donut box'] },
-    { id: 'egg-carton', name: 'Cardboard egg carton', category: 'paper', bin: 'blue', how: 'Flatten it.', aliases: ['egg box', 'cardboard'] },
-    { id: 'newspaper', name: 'Newspaper', category: 'paper', bin: 'blue', how: 'Keep it dry and loose.', aliases: ['paper', 'magazine', 'flyer'] },
-    { id: 'paper-towel', name: 'Paper towel (used)', category: 'paper', bin: 'green', how: 'Used paper towels go in the compost.', aliases: ['paper towels', 'napkin', 'tissue', 'kitchen paper'] },
+    { id: 'cardboard-box', name: 'Cardboard box', category: 'paper', sub: 'cardboard', bin: 'blue', how: 'Flatten it and remove any packing tape.', aliases: ['cardboard', 'box', 'shipping box'] },
+    { id: 'bakery-box', name: 'Bakery box', category: 'paper', sub: 'cardboard', bin: 'blue', how: 'Flatten it. Remove food and any plastic window.', aliases: ['cake box', 'donut box'] },
+    { id: 'egg-carton', name: 'Cardboard egg carton', category: 'paper', sub: 'cardboard', bin: 'blue', how: 'Flatten it.', aliases: ['egg box', 'cardboard'] },
+    { id: 'newspaper', name: 'Newspaper', category: 'paper', sub: 'paper', bin: 'blue', how: 'Keep it dry and loose.', aliases: ['paper', 'magazine', 'flyer'] },
+    { id: 'paper-towel', name: 'Paper towel (used)', category: 'paper', sub: 'paper', bin: 'green', how: 'Used paper towels go in the compost.', aliases: ['paper towels', 'napkin', 'tissue', 'kitchen paper'] },
     // ---- Food scraps ----
-    { id: 'food-scraps', name: 'Food scraps', category: 'food-scraps', bin: 'green', how: 'Put food scraps in the compost bin. Drain liquids first.', aliases: ['leftovers', 'food waste', 'compost'] },
-    { id: 'banana-peel', name: 'Banana peel', category: 'food-scraps', bin: 'green', how: 'Compost it.', aliases: ['peel', 'fruit peel'] },
-    { id: 'apple-core', name: 'Apple core', category: 'food-scraps', bin: 'green', how: 'Compost it.', aliases: ['core', 'fruit'] },
-    { id: 'coffee-grounds', name: 'Coffee grounds', category: 'food-scraps', bin: 'green', how: 'Compost them, with the paper filter.', aliases: ['coffee', 'tea bag'] },
+    { id: 'food-scraps', name: 'Food scraps', category: 'food-scraps', sub: 'other-food', bin: 'green', how: 'Put food scraps in the compost bin. Drain liquids first.', aliases: ['leftovers', 'food waste', 'compost'] },
+    { id: 'banana-peel', name: 'Banana peel', category: 'food-scraps', sub: 'fruit-veg', bin: 'green', how: 'Compost it.', aliases: ['peel', 'fruit peel'] },
+    { id: 'apple-core', name: 'Apple core', category: 'food-scraps', sub: 'fruit-veg', bin: 'green', how: 'Compost it.', aliases: ['core', 'fruit'] },
+    { id: 'coffee-grounds', name: 'Coffee grounds', category: 'food-scraps', sub: 'other-food', bin: 'green', how: 'Compost them, with the paper filter.', aliases: ['coffee', 'tea bag'] },
     // ---- Household ----
     { id: 'broken-mug', name: 'Broken mug', category: 'household', bin: 'black', how: 'Wrap sharp pieces in paper before you put them in the garbage.', aliases: ['mug', 'broken glass', 'ceramic', 'plate'] },
     { id: 'diaper', name: 'Diaper', category: 'household', bin: 'black', how: 'Wrap it and put it in the garbage.', aliases: ['nappy'] },
     // ---- Hazardous ----
-    { id: 'battery', name: 'Battery (household)', category: 'hazardous', bin: 'dropoff', how: 'Keep batteries separate and take them to a drop-off location.', aliases: ['batteries', 'aa battery', 'button battery'], warning: 'Batteries can start a fire in a cart or a truck. Do not put them in any cart.' },
-    { id: 'car-battery', name: 'Car battery', category: 'hazardous', bin: 'dropoff', how: 'Take it to a hazardous waste drop-off or the place that sold it.', aliases: ['vehicle battery', 'auto battery'], warning: 'Car batteries contain acid and heavy metals. Do not put them in any cart.' },
-    { id: 'paint-can', name: 'Paint can (leftover paint)', category: 'hazardous', bin: 'dropoff', how: 'Close the lid tightly and take it to a hazardous waste drop-off.', aliases: ['paint', 'leftover paint'], warning: 'Paint can catch fire or leak in the truck. Take it to a hazardous waste drop-off.' },
-    { id: 'used-oil', name: 'Used oil', category: 'hazardous', bin: 'dropoff', how: 'Transport it in a sealed container and take it to a drop-off.', aliases: ['motor oil', 'engine oil', 'oil'], warning: 'Oil can leak and pollute. Do not pour it down a drain or put it in any cart.' },
+    { id: 'battery', name: 'Battery (household)', category: 'hazardous', sub: 'batteries', bin: 'dropoff', how: 'Keep batteries separate and take them to a drop-off location.', aliases: ['batteries', 'aa battery', 'button battery'], warning: 'Batteries can start a fire in a cart or a truck. Do not put them in any cart.' },
+    { id: 'car-battery', name: 'Car battery', category: 'hazardous', sub: 'batteries', bin: 'dropoff', how: 'Take it to a hazardous waste drop-off or the place that sold it.', aliases: ['vehicle battery', 'auto battery'], warning: 'Car batteries contain acid and heavy metals. Do not put them in any cart.' },
+    { id: 'paint-can', name: 'Paint can (leftover paint)', category: 'hazardous', sub: 'paint-oil', bin: 'dropoff', how: 'Close the lid tightly and take it to a hazardous waste drop-off.', aliases: ['paint', 'leftover paint'], warning: 'Paint can catch fire or leak in the truck. Take it to a hazardous waste drop-off.' },
+    { id: 'used-oil', name: 'Used oil', category: 'hazardous', sub: 'paint-oil', bin: 'dropoff', how: 'Transport it in a sealed container and take it to a drop-off.', aliases: ['motor oil', 'engine oil', 'oil'], warning: 'Oil can leak and pollute. Do not pour it down a drain or put it in any cart.' },
     // ---- Electronics ----
     { id: 'old-phone', name: 'Old phone', category: 'electronics', bin: 'dropoff', how: 'Take it to an electronics drop-off. Delete your data first.', aliases: ['mobile', 'cell phone', 'smartphone', 'charger'] },
   ];
