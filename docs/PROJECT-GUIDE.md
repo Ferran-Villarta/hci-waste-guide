@@ -172,7 +172,7 @@ Items with score 0 are dropped, the rest are sorted best first (and alphabetical
 
 ### 3.6 The screens (`js/ui.js`)
 
-One function per screen: home, search results, item page, saved panel, A–Z list, category, bin ("crash course"), page not found, and the pop-ups (menu, camera, how saving works, report missing item, confirm, "under development").
+One function per screen: home, search results, item page, saved panel, A–Z list, category, bin ("crash course"), building guide, page not found, and the pop-ups (menu, camera, failed scan, how saving works, help, report missing item, report sent, call 311, language, calendar, map, building address, confirm, and a "coming soon" fallback for anything not built).
 
 Each function receives data and returns the HTML of that screen as text. It does not react to clicks itself. Instead, buttons are labelled with what they should do (for example "this button means *save item pizza-box*"), and `app.js` reads those labels when they are clicked.
 
