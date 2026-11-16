@@ -1,6 +1,8 @@
 // Run with: node tests/data.test.js
 // Checks that data/items.js is complete, so a typo in a new item is caught before the demo.
 var assert = require('assert');
+var fs = require('fs');
+var path = require('path');
 var D = require('../data/items.js');
 
 var catIds = D.CATEGORIES.map(function (c) { return c.id; });
@@ -24,12 +26,22 @@ D.ITEMS.forEach(function (it) {
   } else {
     assert.ok(D.BINS[it.bin], where + 'unknown bin ' + it.bin);
   }
-  if (it.bin === 'dropoff') assert.ok(it.warning || it.category === 'electronics', where + 'drop-off items need a warning (or be electronics)');
+  if (it.category === 'hazardous') assert.ok(it.warning, where + 'hazardous items need a warning');
+  assert.ok(/^https:\/\/www\.calgary\.ca\//.test(it.source || ''), where + 'source must be a calgary.ca page');
+  assert.ok(it.img && fs.existsSync(path.join(__dirname, '..', 'assets', 'img', it.img)), where + 'picture missing: ' + it.img);
 });
 
 D.CATEGORIES.forEach(function (c) {
   assert.ok(D.ITEMS.some(function (it) { return it.category === c.id; }), 'category "' + c.id + '" has no items');
 });
+
+// every category, sub-category and bin has a picture that exists
+function picOk(file) { return file && fs.existsSync(path.join(__dirname, '..', 'assets', 'img', file)); }
+D.CATEGORIES.forEach(function (c) {
+  assert.ok(picOk(c.img), 'category "' + c.id + '": picture missing');
+  (c.subs || []).forEach(function (s) { assert.ok(picOk(s.img), 'sub-category "' + s.id + '": picture missing'); });
+});
+Object.keys(D.BINS).forEach(function (b) { assert.ok(picOk(D.BIN_INFO[b].img), 'bin "' + b + '": picture missing'); });
 
 // sub-categories: every item in a category with subs has a known sub, and every sub has items
 D.CATEGORIES.forEach(function (c) {

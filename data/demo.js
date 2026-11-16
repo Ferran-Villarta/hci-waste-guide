@@ -28,9 +28,9 @@
       kind: 'Apartment building, shared bins',
       where: 'Communal bins in the parkade, level P1. Compost bin: yes.',
       items: [
-        { id: 'food-soiled-bag', note: 'Not recyclable. No need to rinse it.', building: 'Use the communal garbage bin in the parkade.' },
+        { id: 'diaper', note: 'Double-bag it and tie it closed.', building: 'Use the communal garbage bin in the parkade.' },
         { id: 'food-scraps', note: 'Compost bin, if your building has one.', building: 'Compost bin: yes, next to the garbage room. If there is none, ask your property manager.' },
-        { id: 'glass-jar', note: 'Lid off, then recycle it.', building: 'Use the blue recycling bin in the parkade.' },
+        { id: 'glass-jar', note: 'Empty and clean it. Labels can stay on.', building: 'Use the blue recycling bin in the parkade.' },
       ],
     },
     { id: '123-example-st-sw', label: '123 Example St SW, Calgary', short: '123 Example St SW', known: false },

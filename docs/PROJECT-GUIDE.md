@@ -11,7 +11,7 @@ Read this first if you are in the team. Section 0 says where the project stands 
 **Built and working** (follows the Figma page "Redesign (final version)"):
 - Home: search with live suggestions, crash course buttons for the three bins, popular categories, A–Z button.
 - Search: ranked results, nicknames ("soda can" finds the pop can), "Did you mean…?" for typos, and the no-result screen with four ways out.
-- Item page: the bin answer, preparation tip, "it depends" items (pizza box, cup), hazard warning first for drop-off items.
+- Item page: the bin answer (in the bin's colour), preparation tip, "it depends" items (pizza box, cup, bakery box), hazard warning first for hazardous items, and a link to the City page the answer comes from.
 - Saving: auto-save when an item is opened, "Saved ✓" / "+ Save" pill, Saved panel with TODAY / RECENT, sorted ticks, "All sorted ✓", remove with Undo, auto-save switch, "How saving works".
 - A–Z list with letter index and filter, category pages with sub-categories (Food Packaging → Plastic → items), crash course pages (with text for each bin), ☰ menu, "Next item" screen.
 
@@ -23,7 +23,9 @@ Read this first if you are in the team. Section 0 says where the project stands 
 - Language: picking a language says "coming soon" (the prototype is in English only).
 - Building guide: address with suggestions, "your building" page, building-specific item pages, and "details unavailable" for unknown addresses.
 
-**Placeholders**: all item answers, the sub-category groups and the crash course text (written by us, not checked against the City's guide), all pictures (grey boxes with an X), and everything in `data/demo.js` (sites, addresses, schedule).
+**Real data and pictures**: 40 items with answers from the City of Calgary guide (shortened), crash course text from the City's pages, and a picture for every item, category and bin (Fluent Emoji 3D).
+
+**Placeholders**: the sub-category groups (made up by us) and everything in `data/demo.js` (sites, addresses, schedule).
 
 ### Open decisions for the team
 
@@ -34,18 +36,17 @@ Read this first if you are in the team. Section 0 says where the project stands 
 | Auto-save on by default? Save animation on? | Both on now. Easy to switch in `js/config.js`. |
 | Green bin tag | Done in code, to confirm: white text on the Figma green (#2e9e4f) was 3.4:1, below the WCAG 4.5:1 minimum for text. The tag now uses a darker green (#25803f, 5.0:1). Update the Figma colour if we keep it. |
 | Sub-categories | Done in code, to confirm: every category has sub-categories, chosen by us (Figma only names "Plastic" and "Cardboard"). Rethink the groups when the real data comes in. |
-| Who does what next | Real data, pictures, testing on phones. To split in the next meeting. |
+| Coloured answers and pictures | Done in code, to confirm: the answer box takes the bin's colour, and pictures sit on a background in the bin's colour. Update Figma if we keep them. |
+| Who does what next | Checking the answers, the walkthroughs, testing on phones. To split in the next meeting. |
 
 ### What to do next
 
 A short summary (changes from Figma, what is done, what is left) is in [`PROJECT-STATE.md`](PROJECT-STATE.md). In short:
-1. Real data from the City of Calgary "What Goes Where" guide: what the walkthroughs need, plus enough items so the app doesn't look empty.
-2. Add real pictures (items, categories, bins), cited.
-3. More colour and feedback: use the bin colours on the answer box, the bin picture and the sorted tick, and give buttons colour.
-4. Check the crash course text and the demo data with the team.
-5. The decisions in the table above.
-6. Accessibility checks with a screen reader on a real phone.
-7. Put it online on GitHub Pages and test it on real phones.
+1. Check a few answers against calgary.ca, and make sure every item the walkthroughs use is in the data.
+2. Replace the pictures that are only close matches, if we find better ones (list in `PROJECT-STATE.md`).
+3. The decisions in the table above.
+4. Accessibility checks with a screen reader on a real phone.
+5. Put it online on GitHub Pages and test it on real phones.
 
 ---
 
@@ -116,14 +117,16 @@ The order matters because each file uses the ones loaded before it. `app.js` is 
 
 `data/demo.js` holds the made-up data for the demo screens: drop-off sites on the map, building addresses and the list of languages. The rest of this section is about `data/items.js`.
 
-A list of 33 items. Each item has:
+A list of 40 items. Each item has:
 - a **name** ("Pizza box"),
 - a **category** ("Paper and Cardboard") and, if that category has sub-categories, a **sub** ("Cardboard"),
 - a **bin**: blue, green, black or drop-off,
 - **how**: a short preparation tip ("Flatten it first"),
 - **aliases**: other words people type ("soda can" for the pop can),
 - sometimes **options**, for "it depends" items (the pizza box can be greasy or clean, each with its own bin),
-- sometimes a **warning**, for hazardous items (battery, paint, oil).
+- sometimes a **warning**, for hazardous items (battery, paint, oil),
+- a **picture** (`img`, a file in `assets/img/`),
+- a **source**: the City of Calgary page the answer comes from, linked at the bottom of the item page.
 
 There are also 6 categories and the 4 bins with their labels ("BLUE BIN", "Recycling"). Every category has sub-categories:
 - Food Packaging: Plastic, Metal, Glass, Cartons and cups
@@ -135,7 +138,7 @@ There are also 6 categories and the 4 bins with their labels ("BLUE BIN", "Recyc
 
 So when the real data is imported, each item only needs a category and a sub. The code still accepts a category without sub-categories (it then lists its items directly), in case the real guide has a small one.
 
-The answers are **placeholders** taken from the Figma screens. They are not checked against the City's real guide.
+The answers come from the City of Calgary "What Goes Where" guide (calgary.ca, checked November 2026), shortened to a sentence or two. Categories, sub-categories and bins have a picture too. `npm test` checks that every item has a calgary.ca source and that every picture file exists.
 
 ### 3.3 The settings (`js/config.js`)
 
@@ -223,7 +226,7 @@ On a big screen the content stays a phone-width column in the middle, because th
 
 ### 3.9 Things around the app
 
-- **`assets/`**: icons, bin cart drawings and the logo, exported from the Figma file, and the Inter font files (`assets/fonts/`).
+- **`assets/`**: icons, bin cart drawings and the logo, exported from the Figma file; the item pictures (`assets/img/`); and the Inter font files (`assets/fonts/`).
 - **`tests/`**: three automatic checks (`npm test`): the data is complete and consistent, the search finds what it should, and the memory saves and restores correctly.
 - **`tools/serve.js`**: a tiny local web server, only for testing on your computer (`node tools/serve.js`, then open http://localhost:8080).
 - **`docs/CITATIONS.md`**: AI use and outside material, as the course requires.
@@ -295,7 +298,7 @@ A: Each file has one job (data, memory, search, drawing, deciding). You can chan
 ### About the data
 
 **Q: Where do the answers come from? Are they correct?**
-A: From the team's Figma screens. They are placeholders and have not been checked against the City of Calgary guide. The footer of every page says so.
+A: From the City of Calgary "What Goes Where" guide (calgary.ca), checked in November 2026 and shortened. Each item page links to the City page it comes from. We only include the walkthrough items and common ones, not the whole guide (agreed with the professor). The footer says it is a student prototype and to check the City guide for real decisions.
 
 **Q: How do I add an item?**
 A: Add one entry to `data/items.js` (the top of that file explains every field), then run `npm test`. The test catches mistakes like a misspelled bin or category.
@@ -342,8 +345,8 @@ A: On purpose, to demonstrate the no-result screen. A test makes sure nobody add
 **Q: How does the app match the Figma design?**
 A: The screens were rebuilt from the Figma page "Redesign (final version)": same sizes, spacing, fonts, colours and components (nav bar, list row, bin tag, answer box, Save pill). The icons are the exact exports from the Figma Components page.
 
-**Q: Why are there grey boxes with an X instead of photos?**
-A: They are the image placeholders from the Figma design. Real photos would go there.
+**Q: Where do the pictures come from?**
+A: They are Fluent Emoji (3D style) by Microsoft, free under the MIT licence and cited in `docs/CITATIONS.md`. The City's guide has no item photos, and photos from different websites would all look different; one illustration set looks consistent and colourful. Each picture sits on a background tinted with the item's bin colour. A few are the closest match the set has (for example, the aerosol can is a spray bottle); `PROJECT-STATE.md` lists them. The grey box with an X only appears where there is no picture (the camera view and the attached scan photo).
 
 **Q: Which parts are not built?**
 A: Every Figma screen is built. But the calendar, map, building guide, photo search, help and report screens are demos: they use made-up data (`data/demo.js`), the photo is never really read (the capture button always finds a pop can), and nothing is ever sent anywhere.
@@ -395,4 +398,4 @@ A: Because it is only plain files, any free static host works. The README explai
 - Opening an item **auto-saves** it ("it depends" items: after choosing an option).
 - Saved panel: **TODAY / RECENT**, tick when **sorted**, **All sorted ✓** when done, ⊗ to remove with **Undo**.
 - Search: scores names and nicknames, **"Did you mean"** for typos, a helpful **no-result** screen as the last resort.
-- No server, nothing is sent anywhere, answers are placeholders.
+- No server, nothing is sent anywhere. Answers come from the City of Calgary guide (shortened), with a source link on each item.

@@ -63,6 +63,28 @@
     return '<span class="ph ' + (cls || '') + '" aria-hidden="true">' + img('placeholder-x.svg', 120, 120, 'ph-x') + '</span>';
   }
 
+  // A picture from assets/img/ on a soft background. "tone" tints the background with a bin colour
+  // (blue, green, black, dropoff); without one it is light grey. No picture: the grey placeholder.
+  function pic(file, cls, tone) {
+    if (!file) return placeholder(cls);
+    return '<span class="pic ' + (cls || '') + (tone ? ' tone-' + tone : '') + '" aria-hidden="true">' +
+      '<img src="' + A + 'img/' + esc(file) + '" alt="" decoding="async"></span>';
+  }
+
+  // Banner with a row of pictures (category page, crash course page).
+  function picBanner(files, tone) {
+    if (!files.length) return placeholder('ph-banner');
+    return '<span class="pic pic-banner ph-banner' + (tone ? ' tone-' + tone : '') + '" aria-hidden="true">' +
+      files.map(function (f) { return '<img src="' + A + 'img/' + esc(f) + '" alt="" decoding="async">'; }).join('') + '</span>';
+  }
+
+  // The bin colour of an item (for the picture background): its bin, or the chosen option's bin.
+  function itemTone(item, choice) {
+    if (item.bin) return item.bin;
+    if (choice != null && item.options && item.options[choice]) return item.options[choice].bin;
+    return '';
+  }
+
   function binTag(ctx, bin, big) {
     var b = ctx.data.BINS[bin];
     var text = bin === 'dropoff' ? 'DROP-OFF' : b.label;
@@ -85,7 +107,7 @@
   // Figma "List row": picture, name, bin tag, line under it.
   function itemRow(ctx, item) {
     return (
-      '<li><a class="row" href="#/item/' + esc(item.id) + '">' + placeholder('ph-56') +
+      '<li><a class="row" href="#/item/' + esc(item.id) + '">' + pic(item.img, 'ph-56', itemTone(item)) +
       '<span class="row-text"><span class="row-title">' + esc(listName(item)) + '</span>' +
       (item.options ? '' : binTag(ctx, item.bin)) + '</span></a></li>'
     );
@@ -130,7 +152,7 @@
       '<a class="skip" href="#/" data-action="skip">Skip to content</a>' +
       '<main id="main" class="page" tabindex="-1">' + inner + '</main>' +
       '<footer class="foot"><p>Student prototype for CPSC 481. Not an official City of Calgary service. ' +
-      'Answers are placeholders and may be wrong. Check the City of Calgary guide for real decisions.</p></footer>'
+      'Answers are shortened from the City of Calgary guide. Check the City guide for real decisions.</p></footer>'
     );
   }
 
@@ -193,14 +215,15 @@
     );
   }
 
-  function tile(href, name) {
+  function tile(href, name, file) {
     return '<li><a class="tile" href="' + esc(href) + '">' +
-      '<span class="tile-img" aria-hidden="true">' + img('tile-placeholder.svg', 162, 110, 'ph-x') + '</span>' +
+      '<span class="tile-img" aria-hidden="true">' +
+      (file ? '<img class="tile-pic" src="' + A + 'img/' + esc(file) + '" alt="" decoding="async">' : img('tile-placeholder.svg', 162, 110, 'ph-x')) + '</span>' +
       '<span class="tile-caption">' + esc(name) + '</span></a></li>';
   }
 
   function categoryTile(c) {
-    return tile('#/category/' + c.id, c.name);
+    return tile('#/category/' + c.id, c.name, c.img);
   }
 
   function noResult(ctx, q) {
@@ -252,7 +275,8 @@
   function answerBox(ctx, bin) {
     var b = ctx.data.BINS[bin];
     var text = bin === 'dropoff' ? b.label : b.label + '!';
-    return '<section class="answer" tabindex="-1" data-focus="answer" aria-label="Answer: ' + esc(b.label) + ', ' + esc(b.name) + '">' +
+    // The box takes the bin's colour (ans-blue, ans-green…), so the answer is clear at a glance.
+    return '<section class="answer ans-' + esc(bin) + '" tabindex="-1" data-focus="answer" aria-label="Answer: ' + esc(b.label) + ', ' + esc(b.name) + '">' +
       '<p class="answer-text">' + esc(text) + '</p></section>';
   }
 
@@ -280,10 +304,10 @@
     var h = navBar(ctx, extra.address ? '#/building/' + extra.address.id : '#/');
     if (extra.scan) {
       h += '<p class="h1 h1-sm">Results for &ldquo;' + esc(item.name.replace(/\s*\(.*\)\s*/, '').toLowerCase()) + '&rdquo;</p>' +
-        '<div class="item-img">' + placeholder('ph-hero ph-220') + savePill(item, entry) + '</div>' +
+        '<div class="item-img">' + pic(item.img, 'ph-hero ph-220', itemTone(item, choice)) + savePill(item, entry) + '</div>' +
         '<h1 class="h1 h1-md">' + esc(item.name) + '</h1>';
     } else {
-      h += '<div class="item-img">' + placeholder('ph-hero') + savePill(item, entry) + '</div>' +
+      h += '<div class="item-img">' + pic(item.img, 'ph-hero', itemTone(item, choice)) + savePill(item, entry) + '</div>' +
         '<h1 class="h1">' + esc(item.name) + '</h1>';
     }
 
@@ -301,7 +325,7 @@
         '<div class="prep"><p class="prep-title">How to prepare it</p><p>' + esc(item.how) + '</p></div>' +
         '<div class="grey-box">' + img('building-22.svg', 22) +
         '<div><p class="grey-box-title">In your building</p><p class="muted">' + esc(extra.building.building) + ' Placeholder data.</p></div></div>' +
-        '<div class="next-row"><a class="btn-next" href="#/search">NEXT ITEM →</a></div>';
+        sourceLine(item) + '<div class="next-row"><a class="btn-next" href="#/search">NEXT ITEM →</a></div>';
       return frame(h);
     }
 
@@ -311,7 +335,7 @@
         '<section class="answer" aria-label="Or: bottle depot"><p class="answer-text">BOTTLE DEPOT</p></section>' +
         '<button type="button" class="link link-pin" data-action="panel" data-panel="map" data-filter="depot">' + img('pin.svg', 20) + 'Find location near me!</button>' +
         '<p class="body">' + esc(item.how) + ' Drink containers can also go to a bottle depot for the deposit refund.</p>' +
-        '<div class="next-row"><a class="btn-next" href="#/search">NEXT ITEM →</a></div>';
+        sourceLine(item) + '<div class="next-row"><a class="btn-next" href="#/search">NEXT ITEM →</a></div>';
       return frame(h);
     }
 
@@ -330,7 +354,7 @@
       h += answerBox(ctx, item.bin) + '<p class="body">' + esc(item.how) + '</p>';
     }
 
-    h += '<div class="next-row"><a class="btn-next" href="#/search">NEXT ITEM →</a></div>';
+    h += sourceLine(item) + '<div class="next-row"><a class="btn-next" href="#/search">NEXT ITEM →</a></div>';
     return frame(h);
   }
 
@@ -338,7 +362,7 @@
     var it = r.item;
     var choiceLabel = it.options && r.entry.choice != null && it.options[r.entry.choice] ? it.options[r.entry.choice].label : '';
     return (
-      '<li class="saved-row' + (r.entry.sorted ? ' is-sorted' : '') + '">' + placeholder('ph-52') +
+      '<li class="saved-row' + (r.entry.sorted ? ' is-sorted' : '') + '">' + pic(it.img, 'ph-52', itemTone(it, r.entry.choice)) +
       '<a class="saved-main" href="#/item/' + esc(it.id) + '"><span class="row-title">' + esc(it.name) + '</span>' +
       (choiceLabel ? '<span class="row-sub">' + esc(choiceLabel) + '</span>' : '') + itemTag(ctx, it, r.entry.choice) + '</a>' +
       '<label class="check"><input type="checkbox" data-change="sorted" data-id="' + esc(it.id) + '"' + (r.entry.sorted ? ' checked' : '') + '>' +
@@ -447,9 +471,9 @@
   function categoryPage(ctx, cat, list) {
     if (!cat.subs) return itemListPage(ctx, cat.name, list, '#/categories');
     return frame(navBar(ctx, '#/categories') + '<h1 class="h1 h1-lg">' + esc(cat.name) + '</h1>' +
-      placeholder('ph-banner') +
+      picBanner(cat.subs.map(function (s) { return s.img; }).filter(Boolean).slice(0, 4)) +
       '<ul class="tiles">' + cat.subs.map(function (s) {
-        return tile('#/category/' + cat.id + '/' + s.id, s.name);
+        return tile('#/category/' + cat.id + '/' + s.id, s.name, s.img);
       }).join('') + '</ul>');
   }
 
@@ -481,9 +505,26 @@
     return frame(
       navBar(ctx, '#/') +
       '<div class="bin-head">' + art + '<h1 class="bin-title">' + esc(title) + '</h1></div>' +
-      placeholder('ph-banner') + text +
+      binBanner(ctx, bin, list) + text +
       label('ITEMS IN OUR GUIDE') + rows(ctx, list)
     );
+  }
+
+  // Where the answer comes from (the City page), under every item answer.
+  function sourceLine(item) {
+    if (!item.source) return '';
+    return '<p class="source">Source: <a href="' + esc(item.source) + '" target="_blank" rel="noopener">City of Calgary, What Goes Where</a></p>';
+  }
+
+  // Crash course banner: the bin's own picture, then up to three items that go in it.
+  function binBanner(ctx, bin, list) {
+    var info = (ctx.data.BIN_INFO || {})[bin] || {};
+    var files = [];
+    if (info.img) files.push(info.img);
+    list.forEach(function (it) {
+      if (it.bin === bin && it.img && files.indexOf(it.img) < 0 && files.length < 4) files.push(it.img);
+    });
+    return picBanner(files, bin);
   }
 
   function notFoundPage(ctx, what) {

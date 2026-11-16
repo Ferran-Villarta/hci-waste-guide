@@ -28,6 +28,7 @@
   --green-soft: #e8f7eb;
   --black-bin: #2b2b2b;
   --warn-bg: #fff5d9;
+  --black-soft: #ececec;  /* picture background for black-bin items */
   --warn-line: #d98c0d;
   --danger: #b3261e;
 
@@ -216,6 +217,15 @@ button.field-btn:hover { background: var(--soft); }
 .answer { display: flex; justify-content: center; padding: 18px; border: 2px solid var(--ink); border-radius: 8px; outline: none; text-align: center; }
 .answer-text { font-size: 28px; font-weight: 700; }
 .answer:focus-visible { outline: 3px solid var(--link-blue); outline-offset: 3px; }
+/* Answer in the bin's colour. White text on these passes 4.5:1 (blue 4.9, green 5.0, black 14). */
+.ans-blue { background: var(--blue); border-color: var(--blue); color: #fff; }
+.ans-green { background: var(--green); border-color: var(--green); color: #fff; }
+.ans-black { background: var(--black-bin); border-color: var(--black-bin); color: #fff; }
+.ans-dropoff { background: var(--warn-bg); border-color: var(--warn-line); }
+
+/* Pressed state: buttons and tappable cards sink a little while pressed. */
+.btn:active, .btn-next:active, .option:active, .tile:active, .row:active, .bin-btn:active, .menu-tile:active, .save-pill:active { transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) { .btn:active, .btn-next:active, .option:active, .tile:active, .row:active, .bin-btn:active, .menu-tile:active, .save-pill:active { transform: none; } }
 
 .hazard { display: flex; align-items: flex-start; gap: 10px; padding: 14px; background: var(--warn-bg); border: 2px solid var(--warn-line); border-radius: 10px; font-size: 13px; }
 .hazard-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -339,6 +349,23 @@ textarea.input { resize: vertical; }
 .tiny { font-size: 11px; }
 .link-small { font-size: 13px; align-self: center; }
 .ph-220 { height: 220px; }
+
+/* Pictures (assets/img/, Fluent Emoji 3D): centred on a soft background tinted with the item's bin colour.
+   Same size classes as the placeholders (.ph-52, .ph-56, .ph-hero, .ph-banner). */
+.pic { display: flex; flex: none; align-items: center; justify-content: center; gap: 6%; background: var(--soft); border-radius: 10px; overflow: hidden; }
+.pic img { width: 74%; height: 74%; object-fit: contain; }
+.pic.ph-52, .pic.ph-56 { border-radius: 8px; }
+.pic.ph-hero img { width: auto; height: 62%; }
+.pic-banner { gap: 14px; }
+.pic-banner img { width: 68px; height: 68px; }
+.tone-blue { background: var(--blue-soft); }
+.tone-green { background: var(--green-soft); }
+.tone-black { background: var(--black-soft); }
+.tone-dropoff { background: var(--warn-bg); }
+.tile-img .tile-pic { position: absolute; left: 50%; top: 50%; width: 72px; height: 72px; transform: translate(-50%, -50%); }
+.tile-img:has(.tile-pic) { background: var(--soft); }
+.source { font-size: 12px; color: var(--gray-2); }
+.source a { color: inherit; }
 .prep { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
 .prep-title { font-size: 15px; font-weight: 700; }
 .crash-text { display: flex; flex-direction: column; gap: var(--gap); }
