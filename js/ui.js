@@ -362,7 +362,7 @@
     var it = r.item;
     var choiceLabel = it.options && r.entry.choice != null && it.options[r.entry.choice] ? it.options[r.entry.choice].label : '';
     return (
-      '<li class="saved-row' + (r.entry.sorted ? ' is-sorted' : '') + '">' + pic(it.img, 'ph-52', itemTone(it, r.entry.choice)) +
+      '<li class="saved-row' + (r.entry.sorted ? ' is-sorted' : '') + '">' + pic(it.img, 'ph-64', itemTone(it, r.entry.choice)) +
       '<a class="saved-main" href="#/item/' + esc(it.id) + '"><span class="row-title">' + esc(it.name) + '</span>' +
       (choiceLabel ? '<span class="row-sub">' + esc(choiceLabel) + '</span>' : '') + itemTag(ctx, it, r.entry.choice) + '</a>' +
       '<label class="check"><input type="checkbox" data-change="sorted" data-id="' + esc(it.id) + '"' + (r.entry.sorted ? ' checked' : '') + '>' +

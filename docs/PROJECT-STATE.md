@@ -14,7 +14,7 @@ Short summary of where the vertical prototype is. For how it works inside, see [
 - **Sub-categories:** Figma only named "Plastic" and "Cardboard". We made up the groups for all six categories.
 - **Bigger tap areas:** nav icons, "← back" and the search field buttons react to a 44 px area. They look the same.
 - **A–Z letters:** 7 per row and 44 px tall (Figma had two rows of 13 at 26 px), so they are easy to tap.
-- **⊗ remove button in Saved:** 44 px tap area, and moved next to the tick (it was in the row's top corner, where a bigger button would overlap the tick).
+- **Saved rows:** bigger pictures (64 px). The ⊗ remove button has a 44 px tap area and sits in its own column, well apart from the tick, so you don't remove an item when you meant to tick it (in Figma it was in the row's top corner).
 - **Font:** the same Inter, but included in the project (`assets/fonts/`) instead of loaded from Google, so it also works offline from the zip.
 - **Added:** a footer saying it is a student prototype.
 - **Added:** a "Skip to content" link. It's invisible until you press Tab, and it jumps past the nav bar. It's of little use on a phone; it's there for keyboard users when the site is used on a computer.

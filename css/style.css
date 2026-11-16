@@ -180,6 +180,7 @@ button.field-btn:hover { background: var(--soft); }
 .ph { position: relative; display: block; flex: none; background: var(--placeholder); border: 1.5px solid var(--line); border-radius: 4px; overflow: hidden; }
 .ph .ph-x { position: absolute; inset: -1.5px; width: calc(100% + 3px); height: calc(100% + 3px); }
 .ph-52 { width: 52px; height: 52px; }
+.ph-64 { width: 64px; height: 64px; }
 .ph-56 { width: 56px; height: 56px; }
 .ph-200 { width: 200px; height: 200px; }
 .ph-hero { width: 100%; height: 240px; }
@@ -271,7 +272,7 @@ button.field-btn:hover { background: var(--soft); }
 .switch input:checked + .switch-track::after { transform: translateX(20px); }
 .switch input:focus-visible + .switch-track { outline: 3px solid var(--link-blue); outline-offset: 2px; }
 
-.group-head { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; letter-spacing: 0.07em; color: var(--gray-2); }
+.group-head { display: flex; justify-content: space-between; padding-right: 40px; /* SORTED sits over the ticks, not the ⊗ */ font-size: 12px; font-weight: 700; letter-spacing: 0.07em; color: var(--gray-2); }
 .saved-list { display: flex; flex-direction: column; margin-top: -4px; }
 .saved-row { position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 4px 12px 0; border-bottom: 1px solid var(--line); }
 .saved-main { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-decoration: none; }
@@ -284,7 +285,7 @@ button.field-btn:hover { background: var(--soft); }
 .check input:checked + .check-box { border-color: var(--green); }
 .check input:checked + .check-box img { visibility: visible; }
 .check input:focus-visible + .check-box { outline: 3px solid var(--link-blue); outline-offset: 2px; }
-.remove-btn { display: grid; place-items: center; flex: none; width: 44px; height: 44px; margin: -10px -10px -10px -8px; border-radius: 50%; } /* 44 px tap area, next to the tick */
+.remove-btn { display: grid; place-items: center; flex: none; width: 44px; height: 44px; margin: -10px -10px -10px 14px; border-radius: 50%; } /* 44 px tap area, well apart from the tick so they aren't confused */
 .remove-btn:hover { background: var(--soft); }
 
 .done { display: flex; align-items: center; gap: 8px; padding: 12px; background: var(--green-soft); border: 1.5px solid var(--green-line); border-radius: 10px; font-size: 13px; }
