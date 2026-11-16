@@ -234,6 +234,9 @@
   }
 
   function afterRender(r, opts) {
+    // New screen: start the keyboard at the top, so the next Tab is "Skip to content".
+    // (Otherwise the browser keeps the old position, somewhere in the middle of the new screen.)
+    if (!opts.keep) app.focus({ preventScroll: true });
     // Search page with nothing typed yet ("Next item"): ready to type.
     if (r.parts[0] === 'search' && !(r.params.q || '').trim()) {
       var q = document.getElementById('q');
@@ -394,10 +397,26 @@
         else go(el.getAttribute('data-fallback') || '#/');
         break;
 
+      // "Skip to content": a link for keyboard users (mostly on desktop) to jump past the nav bar.
+      // How it works:
+      // 1. It is the first thing on every screen (frame() in ui.js), hidden off-screen until it gets
+      //    the keyboard focus (.skip and .skip:focus in style.css). So the first Tab shows it.
+      // 2. Enter runs this: find the nav bar (or the logo bar on Home) and focus the block right after
+      //    it, usually the title. tabindex -1 lets a title take the focus without adding a Tab stop.
+      // 3. The next Tab then goes to the first button or link of the content, not to "← back".
+      // For step 1 to work on every screen, afterRender() puts the focus back at the top after each change.
       case 'skip':
-        e.preventDefault();
+        e.preventDefault(); // don't follow the link's href; it is only there so it counts as a link
         var main = document.getElementById('main');
-        if (main) main.focus();
+        if (!main) break;
+        var bar = main.querySelector('.navbar, .topbar');
+        var target = bar && bar.nextElementSibling;
+        if (target) {
+          if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+          target.focus();
+        } else {
+          main.focus(); // a screen without a nav bar (the Saved panel): start at its top
+        }
         break;
 
       case 'stub':

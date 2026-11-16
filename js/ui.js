@@ -123,6 +123,8 @@
     );
   }
 
+  // Every screen: "Skip to content" link (hidden until focused with Tab; the jump is in app.js,
+  // action "skip"), the screen itself in <main>, and the prototype footer.
   function frame(inner) {
     return (
       '<a class="skip" href="#/" data-action="skip">Skip to content</a>' +

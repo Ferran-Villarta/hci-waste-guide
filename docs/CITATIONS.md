@@ -18,9 +18,9 @@ Figma file. Check with the TA that the final wording of this section is what the
 
 | Item | Use | Source |
 |---|---|---|
-| Inter (font) | Text | Google Fonts, https://fonts.google.com/specimen/Inter (SIL Open Font License) |
+| Inter (font), files in `assets/fonts/` | Text | The Inter Project Authors, https://github.com/rsms/inter (SIL Open Font License, copy in `assets/fonts/OFL.txt`). Files from the Fontsource package `@fontsource/inter` 5.0.18 |
 | Icons and bin cart drawings in `assets/` | All icons | Exported from the team's own Figma file ("What goes where redesign", page Components) |
-| City of Calgary logo (`assets/calgary.png`) | Top bar of the home screen, as in the Figma design | City of Calgary. Used only to show the redesign idea; check with the TA that this is allowed on the public demo link |
+| City of Calgary logo (`assets/calgary.png`) | Top bar of the home screen, as in the Figma design | © City of Calgary, https://www.calgary.ca. Used to show the redesign idea; allowed by the professor as long as it is cited |
 
 No JavaScript libraries are used. Icons are simple SVG shapes written inside `js/ui.js`.
 

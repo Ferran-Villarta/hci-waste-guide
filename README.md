@@ -27,7 +27,7 @@ index.html      page shell
 css/            styles
 js/             app logic (app, ui, search, store, config)
 data/           items, categories, bins, and made-up data for the demo screens
-assets/         icons and images exported from Figma
+assets/         icons and images exported from Figma, and the font
 tests/          automatic checks
 tools/          local server
 docs/           project guide, next steps, citations
@@ -36,7 +36,7 @@ docs/           project guide, next steps, citations
 ## Documentation
 
 - [Project guide](docs/PROJECT-GUIDE.md): state of the project, open decisions, and how everything works.
-- [Next steps](docs/NEXT-STEPS-PROMPT.md): everything left to do.
+- [Project state](docs/PROJECT-STATE.md): what changed from Figma, what is done, what is left.
 - [Citations](docs/CITATIONS.md): AI use and outside material.
 
 ## Deploy

@@ -31,22 +31,21 @@ Read this first if you are in the team. Section 0 says where the project stands 
 |---|---|
 | Do we need a "recent searches" list? | No. Saved already keeps every item looked up (auto-save), so a second list would repeat it. The leftover code that still records searches can be removed. |
 | Home button | Done in code, to confirm: the house was on the home screen, where it did nothing. It is now in the nav bar of every other screen. Update Figma if we keep it. |
-| City of Calgary logo on a public site | Ask the TA if it is allowed on the demo link. |
 | Auto-save on by default? Save animation on? | Both on now. Easy to switch in `js/config.js`. |
-| Font from Google or from our own files | Now from Google Fonts. Copying the font into the project makes it work offline and sends nothing to Google. |
 | Green bin tag | Done in code, to confirm: white text on the Figma green (#2e9e4f) was 3.4:1, below the WCAG 4.5:1 minimum for text. The tag now uses a darker green (#25803f, 5.0:1). Update the Figma colour if we keep it. |
 | Sub-categories | Done in code, to confirm: every category has sub-categories, chosen by us (Figma only names "Plastic" and "Cardboard"). Rethink the groups when the real data comes in. |
 | Who does what next | Real data, pictures, testing on phones. To split in the next meeting. |
 
 ### What to do next
 
-The full list, written so it can be pasted into an AI coding assistant (or used as a checklist), is in [`NEXT-STEPS-PROMPT.md`](NEXT-STEPS-PROMPT.md). In short:
-1. Replace the placeholder answers with real data from the City of Calgary "What Goes Where" guide.
-2. Add real pictures (items, categories, bins).
-3. Check the crash course text and the demo data with the team.
-4. The decisions in the table above.
-5. Accessibility checks with a screen reader on a real phone.
-6. Put it online on GitHub Pages and test it on real phones.
+A short summary (changes from Figma, what is done, what is left) is in [`PROJECT-STATE.md`](PROJECT-STATE.md). In short:
+1. Real data from the City of Calgary "What Goes Where" guide: what the walkthroughs need, plus enough items so the app doesn't look empty.
+2. Add real pictures (items, categories, bins), cited.
+3. More colour and feedback: use the bin colours on the answer box, the bin picture and the sorted tick, and give buttons colour.
+4. Check the crash course text and the demo data with the team.
+5. The decisions in the table above.
+6. Accessibility checks with a screen reader on a real phone.
+7. Put it online on GitHub Pages and test it on real phones.
 
 ---
 
@@ -224,7 +223,7 @@ On a big screen the content stays a phone-width column in the middle, because th
 
 ### 3.9 Things around the app
 
-- **`assets/`**: icons, bin cart drawings and the logo, exported from the Figma file.
+- **`assets/`**: icons, bin cart drawings and the logo, exported from the Figma file, and the Inter font files (`assets/fonts/`).
 - **`tests/`**: three automatic checks (`npm test`): the data is complete and consistent, the search finds what it should, and the memory saves and restores correctly.
 - **`tools/serve.js`**: a tiny local web server, only for testing on your computer (`node tools/serve.js`, then open http://localhost:8080).
 - **`docs/CITATIONS.md`**: AI use and outside material, as the course requires.
@@ -353,7 +352,7 @@ A: Every Figma screen is built. But the calendar, map, building guide, photo sea
 A: Accessibility. The WCAG guidelines (the international web accessibility standard, success criterion 1.4.3, level AA) ask for a contrast of at least 4.5:1 between normal-size text and its background. White text on the Figma green was 3.4:1; the darker green is 5.0:1. You can check any pair of colours at webaim.org/resources/contrastchecker.
 
 **Q: Is it accessible?**
-A: It was built with this in mind: every icon button has a spoken name for screen readers, pop-ups keep the keyboard inside them and close with Escape, there is a "Skip to content" link, focus is clearly outlined, and the animation is skipped for people who ask their system to reduce motion.
+A: It was built with this in mind: every icon button has a spoken name for screen readers, pop-ups keep the keyboard inside them and close with Escape, there is a "Skip to content" link (invisible until you press Tab; it jumps past the nav bar, useful mainly on a computer), each new screen starts the keyboard at the top, focus is clearly outlined, and the animation is skipped for people who ask their system to reduce motion.
 
 ### About how it works inside
 
@@ -372,8 +371,8 @@ A: No. `config.js` is for the team, not for the user. It sets the starting point
 **Q: Why does a button change colour when the mouse is over it?**
 A: It is a CSS rule called `:hover`, in `style.css`. For example, outline buttons, menu rows and icon buttons get a light grey background (`--soft`), the black "NEXT ITEM" button gets darker, and the camera's capture button gets slightly transparent. The mouse pointer becomes a hand because of `cursor: pointer`. On phones there is no hover, so this only shows with a mouse.
 
-**Q: Why is there a link to Google in `index.html`? Can't CSS do it?**
-A: CSS can only say which font to use ("Inter"). The font file itself has to be downloaded from somewhere. Right now it comes from Google Fonts. The alternative is to copy the font files into the project and load them from there: it works offline and sends nothing to Google. If the font cannot load, the page falls back to the system font, so it still works.
+**Q: Where does the font come from?**
+A: CSS can only say which font to use ("Inter"); the font file itself has to come from somewhere. We include it in the project (`assets/fonts/`, four weights, about 90 KB) instead of loading it from Google Fonts. That way it works offline (for example from the zip we hand in), looks the same everywhere, and sends nothing to Google. Inter's licence (SIL Open Font License) allows this; the licence text is in `assets/fonts/OFL.txt`.
 
 ### About running and testing
 

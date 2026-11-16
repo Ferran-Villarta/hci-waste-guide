@@ -3,6 +3,13 @@
  * Values come from the team's Figma file, page "Redesign (final version)" (frames are 390 px wide,
  * 20 px side margins, 18 px between blocks). Colours are tokens in :root, so a change is one line.
  */
+
+/* Inter font, included in the project (assets/fonts, SIL Open Font License) so it works offline and nothing is loaded from Google. */
+@font-face { font-family: Inter; font-style: normal; font-weight: 400; font-display: swap; src: url(../assets/fonts/inter-latin-400.woff2) format('woff2'); }
+@font-face { font-family: Inter; font-style: normal; font-weight: 500; font-display: swap; src: url(../assets/fonts/inter-latin-500.woff2) format('woff2'); }
+@font-face { font-family: Inter; font-style: normal; font-weight: 600; font-display: swap; src: url(../assets/fonts/inter-latin-600.woff2) format('woff2'); }
+@font-face { font-family: Inter; font-style: normal; font-weight: 700; font-display: swap; src: url(../assets/fonts/inter-latin-700.woff2) format('woff2'); }
+
 :root {
   --ink: #1a1a1a;
   --gray: #737373;
@@ -57,6 +64,7 @@ img { display: block; }
 }
 .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: #fff; padding: 8px 12px; border-radius: 6px; z-index: 200; }
 .skip:focus { left: 8px; }
+#app:focus { outline: none; } /* focused after each screen change, only to reset the Tab position */
 .icon { flex: none; }
 
 /* ---------- page ---------- */
