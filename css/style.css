@@ -284,7 +284,7 @@ button.field-btn:hover { background: var(--soft); }
 .check input:checked + .check-box { border-color: var(--green); }
 .check input:checked + .check-box img { visibility: visible; }
 .check input:focus-visible + .check-box { outline: 3px solid var(--link-blue); outline-offset: 2px; }
-.remove-btn { position: absolute; top: 0; right: -8px; padding: 6px 8px; border-radius: 50%; }
+.remove-btn { display: grid; place-items: center; flex: none; width: 44px; height: 44px; margin: -10px -10px -10px -8px; border-radius: 50%; } /* 44 px tap area, next to the tick */
 .remove-btn:hover { background: var(--soft); }
 
 .done { display: flex; align-items: center; gap: 8px; padding: 12px; background: var(--green-soft); border: 1.5px solid var(--green-line); border-radius: 10px; font-size: 13px; }
@@ -293,8 +293,9 @@ button.field-btn:hover { background: var(--soft); }
 .panel-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
 
 /* ---------- A-Z ---------- */
-.letters { display: flex; flex-wrap: wrap; row-gap: 4px; justify-content: space-between; }
-.letter { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 6px; font-size: 13px; font-weight: 700; text-align: center; }
+/* 7 letters per row, each at least 44 px tall, so they are easy to tap on a phone (Figma had 26 px). */
+.letters { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.letter { display: grid; place-items: center; min-height: 44px; border-radius: 8px; font-size: 16px; font-weight: 700; text-align: center; }
 button.letter:hover { background: var(--soft); }
 .letter.is-on { background: var(--ink); color: #fff; }
 .letter.is-empty { color: var(--line); }
