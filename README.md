@@ -39,6 +39,14 @@ docs/           project guide, next steps, citations
 - [Project state](docs/PROJECT-STATE.md): what changed from Figma, what is done, what is left.
 - [Citations](docs/CITATIONS.md): AI use and outside material.
 
-## Deploy
+## Live site
 
-GitHub: **Settings > Pages > Deploy from a branch > `main` / root**. The site appears at `https://<user>.github.io/<repo>/`.
+https://cpsc481-fall2026-t02-gr1.github.io/
+
+It is published with GitHub Pages from the `main` branch (Settings > Pages > Deploy from a branch > `main` / root), so every push to `main` updates it after a minute or two.
+
+## Clone
+
+```bash
+git clone https://github.com/cpsc481-fall2026-t02-gr1/cpsc481-fall2026-t02-gr1.github.io.git
+```

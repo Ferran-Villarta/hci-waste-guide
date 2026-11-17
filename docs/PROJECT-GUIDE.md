@@ -46,7 +46,7 @@ A short summary (changes from Figma, what is done, what is left) is in [`PROJECT
 2. Replace the pictures that are only close matches, if we find better ones (list in `PROJECT-STATE.md`).
 3. The decisions in the table above.
 4. Accessibility checks with a screen reader on a real phone.
-5. Put it online on GitHub Pages and test it on real phones.
+5. Test the live site (https://cpsc481-fall2026-t02-gr1.github.io/) on real phones.
 
 ---
 

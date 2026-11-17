@@ -2,6 +2,9 @@
 
 Short summary of where the vertical prototype is. For how it works inside, see [PROJECT-GUIDE.md](PROJECT-GUIDE.md).
 
+- **Live site:** https://cpsc481-fall2026-t02-gr1.github.io/ (updates a minute or two after each push to `main`).
+- **Repository:** https://github.com/cpsc481-fall2026-t02-gr1/cpsc481-fall2026-t02-gr1.github.io, owned by our team's GitHub organisation (not a personal account).
+
 ## What changed from Figma
 
 - **Pictures:** the grey placeholder boxes are now colourful 3D illustrations (Fluent Emoji by Microsoft), on a background tinted with the item's bin colour.
@@ -31,6 +34,8 @@ Short summary of where the vertical prototype is. For how it works inside, see [
 
 **Pictures:** every item, category, sub-category and bin has one (Fluent Emoji 3D, MIT licence, cited).
 
+**Online:** the site is on GitHub Pages, in the team organisation's repository (links at the top).
+
 **Working as demos** (made-up data in `data/demo.js`, nothing is sent anywhere):
 - Photo search (always finds a pop can) and the failed-scan screen.
 - Calendar, map of drop-off sites, building guide.
@@ -55,13 +60,13 @@ Short summary of where the vertical prototype is. For how it works inside, see [
 - Recent searches: drop them? (Saved already keeps every item looked up.)
 - Keep the home button in the nav bar?
 - Keep the coloured answer boxes and the new pictures? If so, update Figma to match.
-- Who does what.
+- Who does what. Everyone needs to be a member of the organisation to push.
 
 **Accessibility**
 - Test with a screen reader on a real phone (VoiceOver or TalkBack). No keyboard testing: the app is for phones.
 
 **Hand-in**
-- Put it on GitHub Pages (Settings → Pages → `main`, root) and test on a real iPhone and Android phone.
+- Test the live site on a real iPhone and Android phone.
 - Fill in the names in `docs/CITATIONS.md`.
 - Write the markers' instructions for D2L: everyone's full name, the link, and exactly what to tap and type.
 - Upload the zip too, and keep the link working until grades are out.
