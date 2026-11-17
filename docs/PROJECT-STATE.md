@@ -78,7 +78,7 @@ From the assignment brief and the D2L rubric. Grades reward quality and polish o
 - No dead ends: Language now says "English for now" before you pick; Directions opens a real map search.
 - Shortcuts for experts: typing an item's exact name opens its answer directly; suggestions; A–Z letters; Next item. Show them in the video.
 - Error handling, exits, feedback, memory load, consistency: in place (Did you mean, no-result screen, Undo, back and close everywhere, Saved).
-- Stability: test every walkthrough on a real iPhone and Android phone.
+- Stability: test every walkthrough on a real iPhone and Android phone. Fixed so far: on iPhone, tapping a text field zoomed the page in and it stayed zoomed (all fields now use 16 px text).
 
 ## To do from now on
 
