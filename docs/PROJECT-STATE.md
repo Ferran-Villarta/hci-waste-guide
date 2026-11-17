@@ -40,7 +40,7 @@ Short summary of where the vertical prototype is. For how it works inside, see [
 
 **Online:** the site is on GitHub Pages, in the team organisation's repository (links at the top).
 
-**Automatic publishing:** every push to `main` publishes the site by itself through a GitHub workflow (`.github/workflows/pages.yml`). Before publishing, it replaces `?v=dev` in the CSS and JS links of `index.html` with that push's ID, so phones download the newest files right away instead of an old saved copy (this is why the zoom fix seemed not to work at first). Nobody edits the `?v=dev` by hand. **Still to do, once, by an organisation admin:** in the repo go to Settings → Pages → Build and deployment → Source and choose **GitHub Actions** instead of "Deploy from a branch". Until then, GitHub's old publishing also runs on every push and can overwrite the new one, so the automatic refresh doesn't always work.
+**Automatic publishing:** every push to `main` publishes the site by itself through a GitHub workflow (`.github/workflows/pages.yml`). Before publishing, it replaces `?v=dev` in the CSS and JS links of `index.html` with that push's ID, so phones download the newest files right away instead of an old saved copy (this is why the zoom fix seemed not to work at first). Nobody edits the `?v=dev` by hand. For this, the repo's Settings → Pages → Source is set to **GitHub Actions** (done). Each run shows in the repo's **Actions** tab: a green tick when it worked, a red cross if it failed.
 
 **Working as demos** (made-up data in `data/demo.js`, nothing is sent anywhere):
 - Photo search (always finds a pop can) and the failed-scan screen.
