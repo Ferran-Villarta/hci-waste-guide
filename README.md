@@ -49,7 +49,7 @@ docs/           project guide, project state, marker instructions, video script,
 
 https://cpsc481-fall2026-t02-gr1.github.io/
 
-It is published with GitHub Pages from the `main` branch (Settings > Pages > Deploy from a branch > `main` / root), so every push to `main` updates it after a minute or two.
+Every push to `main` publishes it automatically after a minute or two (`.github/workflows/pages.yml`, Settings > Pages > Source: GitHub Actions). The workflow also stamps the CSS and JS links with the commit ID, so phones load the newest version right away.
 
 ## Clone
 
