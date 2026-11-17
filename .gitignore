@@ -5,3 +5,5 @@ dist/
 Thumbs.db
 .vscode/
 .idea/
+# copies with UCIDs (personal data), only for D2L
+private/

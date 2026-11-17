@@ -6,7 +6,7 @@ A static website (plain HTML, CSS and JavaScript). No install, no build step, no
 
 ## Team
 
-Group T02-1 "The Sopranos": Ferran Villarta, *(full name)*, *(full name)*, *(full name)*, *(full name)*, *(full name)*.
+Group T02-1 "The Sopranos": Oluchukwu Ani, Bianca Asuncion, Ferran Villarta, Ali Awan, Bobby Brar, Xavier Lachance.
 
 ## Run
 

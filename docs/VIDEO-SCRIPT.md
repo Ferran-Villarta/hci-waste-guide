@@ -13,7 +13,7 @@ The TA uses this video as a guide to the live demo, so the walkthrough parts fol
 ---
 
 ## Part 1: Overview and context (≈ 0:45) · *(member name)*
-**Show:** title card with the project name, group T02-1 and all names, then the Home screen.
+**Show:** title card with the project name, group T02-1 and all names (Oluchukwu Ani, Bianca Asuncion, Ferran Villarta, Ali Awan, Bobby Brar, Xavier Lachance), then the Home screen.
 
 **Say (draft):** "This is What Goes Where, our redesign of the City of Calgary's waste sorting guide. People in Calgary often don't know which cart something goes in: blue, green or black, or a drop-off. In Part I we found that the current City tool *(main problems from Part I: e.g. long pages, answers hidden in text, hard to search)*. Our goal was a phone app that gives the answer in a few seconds and helps people actually sort their items."
 

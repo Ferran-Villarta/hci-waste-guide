@@ -4,12 +4,12 @@ CPSC 481 Foundations of HCI, Fall 2026 · Design Portfolio II · Group T02-1 "Th
 
 | Full name | UCID |
 |---|---|
-| Ferran Villarta | *(UCID)* |
-| *(full name)* | *(UCID)* |
-| *(full name)* | *(UCID)* |
-| *(full name)* | *(UCID)* |
-| *(full name)* | *(UCID)* |
-| *(full name)* | *(UCID)* |
+| Oluchukwu Ani | *(in the D2L copy)* |
+| Bianca Asuncion | *(in the D2L copy)* |
+| Ferran Villarta | *(in the D2L copy)* |
+| Ali Awan | *(in the D2L copy)* |
+| Bobby Brar | *(in the D2L copy)* |
+| Xavier Lachance | *(in the D2L copy)* |
 
 **Live demo:** https://cpsc481-fall2026-t02-gr1.github.io/
 **Code:** the zip in this D2L submission (also at https://github.com/cpsc481-fall2026-t02-gr1/cpsc481-fall2026-t02-gr1.github.io)

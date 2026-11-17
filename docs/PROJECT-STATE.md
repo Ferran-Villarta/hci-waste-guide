@@ -106,5 +106,5 @@ From the assignment brief and the D2L rubric. Grades reward quality and polish o
 - Test with a screen reader on a real phone (VoiceOver or TalkBack). No keyboard testing: the app is for phones.
 
 **Names** (fill in once, then copy)
-- Full names: README "Team", `CITATIONS.md` "Who checked it", `MARKER-INSTRUCTIONS.md`, the portfolio cover, the video title card.
-- UCIDs: only in the D2L copies (instructions document and portfolio cover), not in this public repo.
+- Full names: done in the README "Team", `MARKER-INSTRUCTIONS.md` and the video title card. Still to fill: `CITATIONS.md` "Who checked it" (who reviewed the AI work), the presenter of each video part, and the portfolio cover.
+- UCIDs: kept out of this public repo. The instructions with UCIDs for D2L are in `private/MARKER-INSTRUCTIONS-D2L.md`, which is only on Ferran's computer (`private/` is in `.gitignore`). Put the UCIDs on the portfolio cover too.
