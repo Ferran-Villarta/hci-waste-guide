@@ -19,8 +19,8 @@ Read this first if you are in the team. Section 0 says where the project stands 
 - Photo search: the capture button always "finds" a pop can and opens the photo result page; "Browse device" shows the "We couldn't recognise this item" screen.
 - Calendar: an example collection schedule for the current month.
 - Map of drop-off sites: filters, pins, and an info card when you tap a pin. "Find a drop-off near me" on hazardous items opens it.
-- Help form, "Report missing item" (with attached photo after a failed scan), "Report sent" with an example notification, and the "Call 311" confirmation. Nothing is sent anywhere.
-- Language: picking a language says "coming soon" (the prototype is in English only).
+- Help: searchable tips at the top (type a word and only the matching tips stay, opened), then the contact form. "Report missing item" (with attached photo after a failed scan), "Report sent" with an example notification, and the "Call 311" confirmation. Nothing is sent anywhere.
+- Language: English is selected and the other languages are marked "coming soon" before you pick, so it is not a dead end.
 - Building guide: address with suggestions, "your building" page, building-specific item pages, and "details unavailable" for unknown addresses.
 
 **Real data and pictures**: 40 items with answers from the City of Calgary guide (shortened), crash course text from the City's pages, and a picture for every item, category and bin (Fluent Emoji 3D).
@@ -397,5 +397,5 @@ A: Because it is only plain files, any free static host works. The README explai
 - Only `app.js` makes decisions; the others each do one job.
 - Opening an item **auto-saves** it ("it depends" items: after choosing an option).
 - Saved panel: **TODAY / RECENT**, tick when **sorted**, **All sorted ✓** when done, ⊗ to remove with **Undo**.
-- Search: scores names and nicknames, **"Did you mean"** for typos, a helpful **no-result** screen as the last resort.
+- Search: scores names and nicknames, **"Did you mean"** for typos, a helpful **no-result** screen as the last resort. Typing an item's **exact name** and pressing search opens its answer directly (shortcut).
 - No server, nothing is sent anywhere. Answers come from the City of Calgary guide (shortened), with a source link on each item.

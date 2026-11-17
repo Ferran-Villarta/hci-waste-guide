@@ -9,6 +9,7 @@ Keep this file up to date. Copy it into the final portfolio.
 |---|---|---|
 | Starter code for this site (HTML, CSS, JavaScript, tests, README) | Claude Code, model Claude Sonnet 5.5 (Anthropic), started 2026-11-12 | *(add the name of the team member who reviewed it)* |
 | Item data in `data/items.js`: answers collected from the City of Calgary pages and shortened, plus the choice of pictures | Claude Code | *(add name)* |
+| Help tips text, the screenshot script (`tools/screenshots.js`), and the drafts of `MARKER-INSTRUCTIONS.md` and `VIDEO-SCRIPT.md` | Claude Code | *(add name)* |
 | Crash course text (`BIN_INFO` in `data/items.js`, summarised from the City's cart pages), the sub-category groups, and made-up demo data in `data/demo.js` (sites, addresses) | Claude Code | *(add name)* |
 
 The AI was used for programming only. The design (screens, layout, colours, flows) comes from the team's own

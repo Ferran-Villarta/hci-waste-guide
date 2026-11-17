@@ -658,19 +658,44 @@
   }
 
   // Figma "12 Help pop-up"
+  // Searchable help: short answers to common questions, filtered as you type (app.js, "help-q").
+  var FAQ = [
+    ['How do I find where something goes?', 'Type the item in the search box on Home, for example "pizza box". You can also tap the camera to search with a photo, browse the categories, or open the A–Z list.'],
+    ['My item isn\'t found. What can I do?', 'Check the spelling: we suggest a correction when we can ("Did you mean…?"). Try a simpler word ("cup" instead of "coffee cup"), look in the A–Z list, or report the missing item so we can add it.'],
+    ['What does "It depends" mean?', 'Some items go in different bins depending on what they are made of or how dirty they are. Pick the option that matches yours, and the answer appears with its bin.'],
+    ['How does saving work?', 'Every item you open is saved automatically in Saved (the bookmark at the top). You can turn auto-save off in Saved and use "+ Save" instead.'],
+    ['How do I mark items as sorted?', 'Open Saved and tick SORTED once the item is in its bin. When everything from today is ticked, you see "All sorted ✓". "Remove sorted items" clears them in one tap.'],
+    ['I removed an item by mistake.', 'Tap Undo on the message at the bottom of the screen, right after removing it.'],
+    ['What does "DROP-OFF ONLY" mean?', 'It never goes in any cart. Batteries, paint and oil go to a fire hall hazardous waste drop-off, electronics to an electronics drop-off, clothes to a City Eco Centre. Use Locations on Home to find one.'],
+    ['What is a City Eco Centre?', 'A City site that takes things your carts can\'t: textiles, electronics, hazardous waste and large items. Many drop-offs there are free.'],
+    ['When is my collection day?', 'Tap Calendar on Home and type your address to see which cart goes out on which day.'],
+    ['I live in an apartment or condo.', 'Tap Building on Home and type your address. It shows where your building\'s bins are and any building rules.'],
+    ['Quick tips for regular users', 'Type the full name of an item and press search to jump straight to its answer. Pick a suggestion while typing. In A–Z, tap a letter to jump. After an answer, "Next item" takes you back to the search.'],
+  ];
+
+  function faqList() {
+    return '<div class="faq" id="faq">' + FAQ.map(function (f) {
+      return '<details class="faq-item"><summary>' + esc(f[0]) + '</summary><p>' + esc(f[1]) + '</p></details>';
+    }).join('') + '</div><p id="faq-none" class="small muted" hidden>No tips match. Ask us with the form below.</p>';
+  }
+
   function helpDialog(error) {
-    return dialog('Need Help',
+    return dialog('Need help?',
+      '<label class="sr-only" for="help-q">Search help</label>' +
+      '<input class="input" id="help-q" type="search" autocomplete="off" placeholder="Search help (i.e. &quot;save&quot;)"' + (error ? '' : ' data-autofocus') + '>' +
+      faqList() +
+      '<h3 class="label-caps help-contact">Still need help? Contact us</h3>' +
       '<form id="help-form" class="form" data-form="help" novalidate>' +
       '<label class="sr-only" for="help-type">Type of issue</label>' + dropdown('help-type', 'type', ISSUES, 'Issue Form') +
       '<label class="sr-only" for="help-issue">Issue</label>' +
-      '<input class="input' + (error ? ' has-error' : '') + '" id="help-issue" name="issue" type="text" data-autofocus placeholder="Issue (i.e. &quot;missing item&quot;)"' +
+      '<input class="input' + (error ? ' has-error' : '') + '" id="help-issue" name="issue" type="text"' + (error ? ' data-autofocus' : '') + ' placeholder="Issue (i.e. &quot;missing item&quot;)"' +
       (error ? ' aria-invalid="true" aria-describedby="help-error"' : '') + '>' +
       (error ? '<p class="error" id="help-error" role="alert">' + esc(error) + '</p>' : '') +
       '<label class="sr-only" for="help-details">Other details</label>' +
       '<textarea class="input input-tall" id="help-details" name="details" placeholder="Other Details"></textarea>' +
       '<button type="submit" class="btn btn-small">Submit</button></form>' +
       '<div class="spacer" aria-hidden="true"></div>',
-      callButton(), { hideTitle: true });
+      callButton());
   }
 
   // Figma "12b Report missing item (from failed scan)"
@@ -716,10 +741,17 @@
   }
 
   // Figma "13 Language pop-up"
+  // Figma "13 Language pop-up". The prototype is in English only, so it says so before you pick:
+  // English is selected, the other languages are shown as "coming soon" and can't be picked.
   function languageDialog(languages) {
-    return dialog('Language', '<div class="menu-rows">' + languages.map(function (l) {
-      return '<button type="button" class="btn btn-outline" lang="' + esc(l.code) + '" data-action="language-pick" data-name="' + esc(l.name) + '">' + esc(l.name) + '</button>';
-    }).join('') + '</div>', '', { hideTitle: true });
+    return dialog('Language',
+      '<p class="body">The guide is in English for now. These languages are coming soon:</p>' +
+      '<div class="menu-rows">' +
+      '<button type="button" class="btn btn-outline is-current" aria-pressed="true" data-action="close-modal">English ✓</button>' +
+      languages.map(function (l) {
+        return '<button type="button" class="btn btn-outline" disabled aria-disabled="true"><span lang="' + esc(l.code) + '">' + esc(l.name) + '</span>' +
+          '<span class="soon">coming soon</span></button>';
+      }).join('') + '</div>', '', { hideTitle: true });
   }
 
   // Figma "10 Calendar pop-up". Example schedule: green every week, blue and black on alternate weeks.
@@ -785,7 +817,8 @@
     return '<div class="pin-card"><div class="pin-card-top">' + img('map-pin-' + site.type + '-20.svg', 21) +
       '<p class="pin-card-title">' + esc(site.name) + '</p></div>' + rowsHtml +
       '<p class="tiny muted">Placeholder data — real details come from the City\'s site list.</p>' +
-      '<div class="pin-card-btns"><button type="button" class="btn btn-small" data-action="demo" data-msg="Demo: directions would open in your maps app.">Directions</button>' +
+      '<div class="pin-card-btns"><a class="btn btn-small" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=' +
+      encodeURIComponent(site.name + ' Calgary') + '">Directions</a>' +
       '<button type="button" class="btn btn-small" data-action="call">Call site</button></div></div>';
   }
 

@@ -456,10 +456,6 @@
         openModal(UI.callDialog());
         break;
 
-      case 'language-pick':
-        closeModal();
-        toast(el.getAttribute('data-name') + ': coming soon. The prototype is in English only.');
-        break;
 
       case 'find-me':
         findPlace('your location');
@@ -559,6 +555,16 @@
     }
   });
 
+  // The one item whose name (without the part in brackets) is exactly what was typed, or null.
+  function exactItem(q) {
+    var n = Search.normalize(q);
+    if (!n) return null;
+    var hits = D.ITEMS.filter(function (it) {
+      return Search.normalize(it.name) === n || Search.normalize(it.name.replace(/\s*\(.*\)\s*/, ' ')) === n;
+    });
+    return hits.length === 1 ? hits[0] : null;
+  }
+
   document.addEventListener('submit', function (e) {
     var form = e.target;
     var kind = form.getAttribute && form.getAttribute('data-form');
@@ -568,7 +574,9 @@
     if (kind === 'search') {
       var q = form.elements.q.value.trim();
       hideSuggest();
-      go('#/search' + (q ? '?q=' + encodeURIComponent(q) : ''));
+      // Shortcut for regular users: the exact name of one item ("pizza box") opens its answer directly.
+      var exact = exactItem(q);
+      go(exact ? '#/item/' + exact.id : '#/search' + (q ? '?q=' + encodeURIComponent(q) : ''));
     } else if (kind === 'report') {
       // (the field is called "what" because form.elements.item is a built-in method, not our field)
       var what = form.elements.what.value.trim();
@@ -654,8 +662,24 @@
     if (none) none.hidden = shown > 0;
   }
 
+  // Help search: show only the tips whose question or answer has every word typed, and open them.
+  function filterHelp(value) {
+    var words = Search.normalize(value).split(' ').filter(Boolean);
+    var shown = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('#faq .faq-item'), function (d) {
+      var text = Search.normalize(d.textContent);
+      var hit = words.every(function (w) { return text.indexOf(w) >= 0; });
+      d.hidden = !hit;
+      d.open = hit && words.length > 0;
+      if (hit) shown++;
+    });
+    var none = document.getElementById('faq-none');
+    if (none) none.hidden = shown > 0;
+  }
+
   document.addEventListener('input', function (e) {
     if (e.target && e.target.id === 'az-filter') { filterAz(e.target.value); return; }
+    if (e.target && e.target.id === 'help-q') { filterHelp(e.target.value); return; }
     if (e.target && e.target.id === 'addr') {
       var list = document.getElementById('addr-list');
       if (list) list.innerHTML = UI.addressList(matchAddresses(e.target.value));
